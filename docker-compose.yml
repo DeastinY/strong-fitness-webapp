@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./data.csv:/app/seed/data.csv:ro
+    environment:
+      - DATABASE_URL=sqlite:///./data/fitness.db
+      - SEED_CSV_PATH=/app/seed/data.csv
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - PUBLIC_API_URL=http://localhost:8000
