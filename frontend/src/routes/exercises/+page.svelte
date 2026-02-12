@@ -70,9 +70,9 @@
 	<title>Exercises - Fitness Tracker</title>
 </svelte:head>
 
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-6">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Exercise Analysis</h1>
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Exercises</h1>
 		<UnitToggle bind:unit />
 	</div>
 

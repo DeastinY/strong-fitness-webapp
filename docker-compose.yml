@@ -1,20 +1,34 @@
 services:
   backend:
     build: ./backend
-    ports:
-      - "8000:8000"
+    container_name: fitness-backend
+    restart: unless-stopped
+    expose:
+      - "8000"
     volumes:
-      - ./backend/data:/app/data
+      - fitness-data:/app/data
       - ./data.csv:/app/seed/data.csv:ro
     environment:
       - DATABASE_URL=sqlite:///./data/fitness.db
       - SEED_CSV_PATH=/app/seed/data.csv
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   frontend:
     build: ./frontend
+    container_name: fitness-frontend
+    restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "3000:3000"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
-      - PUBLIC_API_URL=http://localhost:8000
+      - ORIGIN=${ORIGIN:-http://localhost:3000}
+      - API_BACKEND=http://backend:8000
+
+volumes:
+  fitness-data:

@@ -12,6 +12,7 @@
 	import WorkoutCalendar from '$lib/components/dashboard/WorkoutCalendar.svelte';
 	import ConsistencyScore from '$lib/components/dashboard/ConsistencyScore.svelte';
 	import OneRMTrends from '$lib/components/charts/OneRMTrends.svelte';
+	import NextWorkoutTip from '$lib/components/dashboard/NextWorkoutTip.svelte';
 	import LLMExport from '$lib/components/dashboard/LLMExport.svelte';
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
 	import { Activity, Flame, Dumbbell, Clock } from 'lucide-svelte';
@@ -70,10 +71,10 @@
 	<title>Dashboard - Fitness Tracker</title>
 </svelte:head>
 
-<div class="space-y-6">
-	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-		<div class="flex items-center gap-3">
+<div class="space-y-4 sm:space-y-6">
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+		<div class="flex items-center gap-2 sm:gap-3">
 			{#if kpi}
 				<LLMExport {kpi} {volumeData} {categoryData} {recentWorkouts} />
 			{/if}
@@ -82,57 +83,70 @@
 	</div>
 
 	{#if loading}
-		<div class="flex items-center justify-center h-64">
-			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+		<div class="flex flex-col items-center justify-center h-64 gap-3">
+			<div class="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
+			<p class="text-sm text-gray-500 dark:text-gray-400">Loading your fitness data...</p>
 		</div>
 	{:else if error}
-		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
+		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-red-700 dark:text-red-400">
 			{error}
 		</div>
 	{:else if kpi}
+		<!-- Next Workout Recommendation -->
+		{#if workoutDetails.length > 0}
+			<NextWorkoutTip {workoutDetails} {categoryData} />
+		{/if}
+
+		<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+			<KpiCard
+				title="Workouts"
+				value={kpi.total_workouts}
+				icon={Activity}
+				color="blue"
+			/>
+			<KpiCard
+				title="Streak"
+				value={kpi.current_streak}
+				subtitle="weeks"
+				icon={Flame}
+				color="orange"
+			/>
+			<KpiCard
+				title="Volume"
+				value="{formatVolume(kpi.total_volume, unit)}"
+				subtitle={unit}
+				icon={Dumbbell}
+				color="green"
+			/>
+			<KpiCard
+				title="Duration"
+				value={formatDuration(kpi.avg_duration)}
+				subtitle="avg"
+				icon={Clock}
+				color="purple"
+			/>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+			<div class="lg:col-span-2 order-2 lg:order-1">
+				<VolumeChart data={volumeData} {unit} title="Volume Trend" />
+			</div>
+			<div class="order-1 lg:order-2">
+				<ConsistencyScore workouts={allWorkouts} />
+			</div>
+		</div>
+
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+			<WorkoutCalendar workouts={allWorkouts} />
+			<MuscleGroupChart data={categoryData} {unit} title="Muscle Groups" />
+		</div>
+
+		<OneRMTrends {workoutDetails} />
+
 		<!-- Tip of the Day -->
 		{#if tip}
 			<TipCard {tip} />
 		{/if}
-
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-			<KpiCard
-				title="Total Workouts"
-				value={kpi.total_workouts}
-				icon={Activity}
-			/>
-			<KpiCard
-				title="Week Streak"
-				value={kpi.current_streak}
-				subtitle="consecutive weeks"
-				icon={Flame}
-			/>
-			<KpiCard
-				title="Total Volume"
-				value="{formatVolume(kpi.total_volume, unit)} {unit}"
-				icon={Dumbbell}
-			/>
-			<KpiCard
-				title="Avg Duration"
-				value={formatDuration(kpi.avg_duration)}
-				subtitle="per workout"
-				icon={Clock}
-			/>
-		</div>
-
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-			<div class="lg:col-span-2">
-				<VolumeChart data={volumeData} {unit} title="Volume Trend" />
-			</div>
-			<ConsistencyScore workouts={allWorkouts} />
-		</div>
-
-		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-			<WorkoutCalendar workouts={allWorkouts} />
-			<MuscleGroupChart data={categoryData} {unit} title="Volume by Muscle Group" />
-		</div>
-
-		<OneRMTrends {workoutDetails} />
 
 		<WorkoutList workouts={recentWorkouts} {unit} />
 	{/if}

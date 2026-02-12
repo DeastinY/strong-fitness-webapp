@@ -87,38 +87,39 @@
 	<title>Workouts - Fitness Tracker</title>
 </svelte:head>
 
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-6">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Workout History</h1>
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Workouts</h1>
 		<UnitToggle bind:unit />
 	</div>
 
 	{#if loading}
-		<div class="flex items-center justify-center h-64">
-			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+		<div class="flex flex-col items-center justify-center h-64 gap-3">
+			<div class="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
+			<p class="text-sm text-gray-500 dark:text-gray-400">Loading workouts...</p>
 		</div>
 	{:else if error}
-		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
+		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-red-700 dark:text-red-400">
 			{error}
 		</div>
 	{:else}
-		<div class="space-y-4">
+		<div class="space-y-3 sm:space-y-4">
 			{#each workouts as workout (workout.id)}
 				<Card class="overflow-hidden">
 					<button
-						class="w-full px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+						class="w-full px-4 sm:px-6 py-3 sm:py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/30 active:bg-gray-100 dark:active:bg-gray-700/50 transition-colors"
 						on:click={() => toggleExpand(workout.id)}
 					>
-						<div class="flex items-center justify-between">
-							<div>
-								<p class="font-semibold text-gray-900 dark:text-white">{workout.name}</p>
-								<p class="text-sm text-gray-500 dark:text-gray-400">{formatDateTime(workout.date)}</p>
+						<div class="flex items-center justify-between gap-3">
+							<div class="min-w-0 flex-1">
+								<p class="font-semibold text-gray-900 dark:text-white truncate">{workout.name}</p>
+								<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{formatDateTime(workout.date)}</p>
 							</div>
-							<div class="flex items-center gap-6">
-								<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+							<div class="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+								<div class="hidden sm:flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
 									<span class="flex items-center gap-1">
 										<Dumbbell class="w-4 h-4" />
-										{formatVolume(workout.total_volume, unit)} {unit}
+										{formatVolume(workout.total_volume, unit)}
 									</span>
 									<span class="flex items-center gap-1">
 										<Clock class="w-4 h-4" />
@@ -126,8 +127,12 @@
 									</span>
 									<span class="flex items-center gap-1">
 										<Layers class="w-4 h-4" />
-										{workout.set_count} sets
+										{workout.set_count}
 									</span>
+								</div>
+								<div class="flex sm:hidden items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+									<span>{formatDuration(workout.duration_minutes)}</span>
+									<span>{workout.set_count} sets</span>
 								</div>
 								{#if expandedId === workout.id}
 									<ChevronUp class="w-5 h-5 text-gray-400" />
@@ -139,34 +144,33 @@
 					</button>
 
 					{#if expandedId === workout.id}
-						<div class="px-6 pb-4 border-t border-gray-100 dark:border-gray-700">
+						<div class="px-4 sm:px-6 pb-4 border-t border-gray-100 dark:border-gray-700/50">
 							{#if loadingDetails}
 								<div class="py-8 flex justify-center">
-									<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+									<div class="w-6 h-6 rounded-full border-2 border-blue-200 border-t-blue-600 animate-spin"></div>
 								</div>
 							{:else if expandedWorkout}
-								<div class="mt-4 space-y-4">
+								<div class="mt-3 sm:mt-4 space-y-3 sm:space-y-4">
 									{#each groupSetsByExercise(expandedWorkout.sets) as [exerciseName, sets]}
 										{@const category = sets[0]?.exercise?.category || 'other'}
-										<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-											<div class="flex items-center gap-2 mb-3">
+										<div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 sm:p-4">
+											<div class="flex items-center gap-2 mb-2 sm:mb-3">
 												<span
-													class="w-2 h-2 rounded-full"
+													class="w-2.5 h-2.5 rounded-full"
 													style="background-color: {getCategoryColor(category)}"
 												></span>
-												<h4 class="font-medium text-gray-900 dark:text-white">{exerciseName}</h4>
-												<span class="text-xs text-gray-500 dark:text-gray-400 capitalize">({category})</span>
+												<h4 class="font-medium text-sm sm:text-base text-gray-900 dark:text-white">{exerciseName}</h4>
 											</div>
-											<div class="grid grid-cols-4 gap-2 text-sm">
+											<div class="grid grid-cols-4 gap-1.5 sm:gap-2 text-xs sm:text-sm">
 												<div class="font-medium text-gray-500 dark:text-gray-400">Set</div>
 												<div class="font-medium text-gray-500 dark:text-gray-400">Weight</div>
 												<div class="font-medium text-gray-500 dark:text-gray-400">Reps</div>
-												<div class="font-medium text-gray-500 dark:text-gray-400">Volume</div>
+												<div class="font-medium text-gray-500 dark:text-gray-400">Vol</div>
 												{#each sets as set}
 													<div class="text-gray-900 dark:text-gray-200">{set.set_order || '-'}</div>
 													<div class="text-gray-900 dark:text-gray-200">{formatWeight(set.weight_lbs, unit)}</div>
 													<div class="text-gray-900 dark:text-gray-200">{set.reps || '-'}</div>
-													<div class="text-gray-900 dark:text-gray-200">{formatVolume(set.volume, unit)} {unit}</div>
+													<div class="text-gray-900 dark:text-gray-200">{formatVolume(set.volume, unit)}</div>
 												{/each}
 											</div>
 										</div>
@@ -180,7 +184,7 @@
 		</div>
 
 		{#if hasMore}
-			<div class="flex justify-center pt-4">
+			<div class="flex justify-center pt-2 sm:pt-4">
 				<Button variant="secondary" on:click={loadMore} disabled={loadingMore}>
 					{#if loadingMore}
 						Loading...

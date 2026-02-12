@@ -72,8 +72,8 @@
 	<title>Upload - Fitness Tracker</title>
 </svelte:head>
 
-<div class="space-y-6">
-	<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Upload CSV</h1>
+<div class="space-y-4 sm:space-y-6">
+	<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Upload</h1>
 
 	{#if result}
 		<Card class="p-6">

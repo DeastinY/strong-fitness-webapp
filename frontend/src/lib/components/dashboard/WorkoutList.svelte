@@ -10,32 +10,32 @@
 </script>
 
 <Card class="overflow-hidden">
-	<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-		<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Workouts</h3>
+	<div class="px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-gray-700/50">
+		<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Recent Workouts</h3>
 	</div>
-	<div class="divide-y divide-gray-100 dark:divide-gray-700">
+	<div class="divide-y divide-gray-100 dark:divide-gray-700/50">
 		{#each workouts as workout}
 			<a
 				href="/workouts"
-				class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+				class="block px-4 sm:px-6 py-3 sm:py-4 hover:bg-gray-50 dark:hover:bg-gray-700/30 active:bg-gray-100 dark:active:bg-gray-700/50 transition-colors"
 			>
-				<div class="flex items-center justify-between">
-					<div>
-						<p class="font-medium text-gray-900 dark:text-white">{workout.name}</p>
-						<p class="text-sm text-gray-500 dark:text-gray-400">{formatDate(workout.date)}</p>
+				<div class="flex items-center justify-between gap-3">
+					<div class="min-w-0 flex-1">
+						<p class="font-medium text-gray-900 dark:text-white truncate">{workout.name}</p>
+						<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{formatDate(workout.date)}</p>
 					</div>
-					<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-						<span class="flex items-center gap-1">
+					<div class="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
+						<span class="hidden sm:flex items-center gap-1">
 							<Dumbbell class="w-4 h-4" />
 							{formatVolume(workout.total_volume, unit)} {unit}
 						</span>
 						<span class="flex items-center gap-1">
-							<Clock class="w-4 h-4" />
+							<Clock class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
 							{formatDuration(workout.duration_minutes)}
 						</span>
 						<span class="flex items-center gap-1">
-							<Layers class="w-4 h-4" />
-							{workout.set_count} sets
+							<Layers class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+							{workout.set_count}
 						</span>
 					</div>
 				</div>

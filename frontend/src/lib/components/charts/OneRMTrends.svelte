@@ -184,30 +184,30 @@
 	});
 </script>
 
-<Card class="p-6">
-	<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Estimated 1RM Trends</h3>
+<Card class="p-4 sm:p-6">
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">Strength Progress</h3>
 
 	{#if exerciseData.length > 0}
-		<div class="h-64 mb-4">
+		<div class="h-48 sm:h-64 mb-3 sm:mb-4">
 			<canvas bind:this={canvas}></canvas>
 		</div>
 
-		<div class="border-t border-gray-200 dark:border-gray-700 pt-4">
-			<div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Progress Summary</div>
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+		<div class="border-t border-gray-100 dark:border-gray-700/50 pt-3 sm:pt-4">
+			<div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">Est. 1RM Change</div>
+			<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
 				{#each progressSummary as item, i}
-					<div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-800">
-						<div class="flex items-center gap-2">
+					<div class="flex items-center justify-between p-2 sm:p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+						<div class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
 							<div
-								class="w-3 h-3 rounded-full"
+								class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0"
 								style="background-color: {colors[i % colors.length].border}"
 							></div>
-							<span class="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[120px]">
-								{item.name}
+							<span class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 truncate">
+								{item.name.split(' ')[0]}
 							</span>
 						</div>
 						<span
-							class="text-sm font-medium {item.change >= 0
+							class="text-xs sm:text-sm font-semibold flex-shrink-0 ml-1 {item.change >= 0
 								? 'text-green-600 dark:text-green-400'
 								: 'text-red-600 dark:text-red-400'}"
 						>
@@ -218,8 +218,8 @@
 			</div>
 		</div>
 	{:else}
-		<div class="h-48 flex items-center justify-center text-gray-500 dark:text-gray-400">
-			Need at least 2 sessions per exercise to show trends
+		<div class="h-32 sm:h-48 flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
+			Need at least 2 sessions per exercise
 		</div>
 	{/if}
 </Card>

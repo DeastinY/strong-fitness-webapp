@@ -100,42 +100,42 @@
 	}
 </script>
 
-<Card class="p-6">
+<Card class="p-4 sm:p-6">
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Workout Calendar</h3>
-		<div class="flex items-center gap-2">
+		<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Calendar</h3>
+		<div class="flex items-center gap-1 sm:gap-2">
 			<button
 				on:click={prevMonth}
-				class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+				class="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
 			>
-				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 				</svg>
 			</button>
-			<span class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[140px] text-center">
+			<span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px] sm:min-w-[140px] text-center">
 				{monthName}
 			</span>
 			<button
 				on:click={nextMonth}
-				class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
+				class="p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 transition-colors"
 			>
-				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 				</svg>
 			</button>
 		</div>
 	</div>
 
-	<div class="grid grid-cols-7 gap-1">
+	<div class="grid grid-cols-7 gap-0.5 sm:gap-1">
 		{#each weekdays as day}
-			<div class="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2">
-				{day}
+			<div class="text-center text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 py-1 sm:py-2">
+				{day.slice(0, 1)}
 			</div>
 		{/each}
 
 		{#each calendarDays as day}
 			<div
-				class="aspect-square rounded-md flex items-center justify-center text-xs transition-colors
+				class="aspect-square rounded sm:rounded-md flex items-center justify-center text-[10px] sm:text-xs font-medium transition-colors
 					{day.isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}
 					{getIntensityClass(day.volume)}"
 				title={day.volume > 0 ? `${day.date.toLocaleDateString()}: ${Math.round(day.volume).toLocaleString()} lbs` : ''}
@@ -145,14 +145,14 @@
 		{/each}
 	</div>
 
-	<div class="mt-4 flex items-center justify-end gap-2 text-xs text-gray-500 dark:text-gray-400">
+	<div class="mt-3 sm:mt-4 flex items-center justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
 		<span>Less</span>
-		<div class="flex gap-1">
-			<div class="w-3 h-3 rounded bg-gray-100 dark:bg-gray-800"></div>
-			<div class="w-3 h-3 rounded bg-green-300 dark:bg-green-200"></div>
-			<div class="w-3 h-3 rounded bg-green-400 dark:bg-green-300"></div>
-			<div class="w-3 h-3 rounded bg-green-500 dark:bg-green-400"></div>
-			<div class="w-3 h-3 rounded bg-green-600 dark:bg-green-500"></div>
+		<div class="flex gap-0.5 sm:gap-1">
+			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-gray-100 dark:bg-gray-800"></div>
+			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-300 dark:bg-green-700"></div>
+			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-400 dark:bg-green-600"></div>
+			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-500 dark:bg-green-500"></div>
+			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-600 dark:bg-green-400"></div>
 		</div>
 		<span>More</span>
 	</div>

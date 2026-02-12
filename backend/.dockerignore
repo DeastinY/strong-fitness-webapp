@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+*.pyo
+.venv
+venv
+.env
+*.db
+*.db-journal
+.git
+.gitignore
+README.md
+.vscode
+.idea
+data/

@@ -83,23 +83,23 @@
 	}
 </script>
 
-<Card class="p-6">
-	<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Consistency Score</h3>
+<Card class="p-4 sm:p-6">
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Consistency</h3>
 
-	<div class="flex items-center justify-between mb-6">
-		<div class="text-center">
-			<div class="text-4xl font-bold {getScoreColor(consistency.score)}">
+	<div class="flex items-center justify-between mb-4 sm:mb-6">
+		<div>
+			<div class="text-3xl sm:text-4xl font-bold {getScoreColor(consistency.score)}">
 				{consistency.score}%
 			</div>
-			<div class="text-sm text-gray-500 dark:text-gray-400">{getScoreLabel(consistency.score)}</div>
+			<div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{getScoreLabel(consistency.score)}</div>
 		</div>
 
-		<div class="w-24 h-24 relative">
+		<div class="w-20 h-20 sm:w-24 sm:h-24 relative">
 			<svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
 				<path
 					class="text-gray-200 dark:text-gray-700"
 					stroke="currentColor"
-					stroke-width="3"
+					stroke-width="3.5"
 					fill="none"
 					d="M18 2.0845
 						a 15.9155 15.9155 0 0 1 0 31.831
@@ -108,7 +108,7 @@
 				<path
 					class="{getScoreColor(consistency.score)}"
 					stroke="currentColor"
-					stroke-width="3"
+					stroke-width="3.5"
 					stroke-linecap="round"
 					fill="none"
 					stroke-dasharray="{consistency.score}, 100"
@@ -120,29 +120,29 @@
 		</div>
 	</div>
 
-	<div class="space-y-3">
-		<div class="flex items-center justify-between text-sm">
+	<div class="space-y-2.5 sm:space-y-3">
+		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-				<Target class="w-4 h-4" />
-				<span>Weekly Target</span>
+				<Target class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+				<span>Target</span>
 			</div>
-			<span class="font-medium text-gray-900 dark:text-white">{targetPerWeek}x/week</span>
+			<span class="font-medium text-gray-900 dark:text-white">{targetPerWeek}x/wk</span>
 		</div>
 
-		<div class="flex items-center justify-between text-sm">
+		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-				<Calendar class="w-4 h-4" />
+				<Calendar class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
 				<span>Average</span>
 			</div>
 			<span class="font-medium text-gray-900 dark:text-white">
-				{consistency.avgPerWeek.toFixed(1)}x/week
+				{consistency.avgPerWeek.toFixed(1)}x/wk
 			</span>
 		</div>
 
-		<div class="flex items-center justify-between text-sm">
+		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-				<TrendingUp class="w-4 h-4" />
-				<span>4-Week Trend</span>
+				<TrendingUp class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+				<span>Trend</span>
 			</div>
 			<span class="font-medium {consistency.trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
 				{consistency.trend >= 0 ? '+' : ''}{consistency.trend}%
@@ -151,24 +151,24 @@
 	</div>
 
 	{#if consistency.weeks.length > 0}
-		<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-			<div class="text-xs text-gray-500 dark:text-gray-400 mb-2">Last 12 weeks</div>
-			<div class="flex gap-1">
+		<div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 dark:border-gray-700/50">
+			<div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1.5 sm:mb-2">Last 12 weeks</div>
+			<div class="flex gap-0.5 sm:gap-1">
 				{#each consistency.weeks.slice(-12) as week}
 					<div
-						class="flex-1 h-8 rounded transition-colors
+						class="flex-1 h-6 sm:h-8 rounded-sm sm:rounded transition-colors
 							{week.count >= targetPerWeek
-								? 'bg-green-500 dark:bg-green-400'
+								? 'bg-green-500 dark:bg-green-500'
 								: week.count > 0
-									? 'bg-yellow-400 dark:bg-yellow-300'
+									? 'bg-yellow-400 dark:bg-yellow-500'
 									: 'bg-gray-200 dark:bg-gray-700'}"
 						title="{week.weekStart.toLocaleDateString()}: {week.count} workouts"
 					></div>
 				{/each}
 			</div>
-			<div class="flex justify-between text-xs text-gray-400 dark:text-gray-500 mt-1">
-				<span>12 weeks ago</span>
-				<span>This week</span>
+			<div class="flex justify-between text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 mt-1">
+				<span>12w ago</span>
+				<span>Now</span>
 			</div>
 		</div>
 	{/if}

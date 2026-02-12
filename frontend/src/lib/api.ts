@@ -10,9 +10,8 @@ import type {
 	UploadResult
 } from './types';
 
-const API_URL = typeof window !== 'undefined'
-	? (window as unknown as { ENV?: { PUBLIC_API_URL?: string } }).ENV?.PUBLIC_API_URL || 'http://localhost:8000'
-	: 'http://localhost:8000';
+// Use /api prefix - proxied to backend by SvelteKit server
+const API_URL = '/api';
 
 // Filter year - change this to show different years
 const FILTER_YEAR = 2026;

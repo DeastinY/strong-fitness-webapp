@@ -67,18 +67,18 @@
 </script>
 
 <Card class="overflow-hidden">
-	<div class="flex items-start gap-4 p-6 {colors.bg} border-l-4 {colors.border}">
-		<div class="flex-shrink-0 p-3 bg-white dark:bg-gray-800 rounded-full shadow-sm">
-			<svelte:component this={IconComponent} class="w-6 h-6 {colors.icon}" />
+	<div class="flex items-start gap-3 sm:gap-4 p-4 sm:p-6 {colors.bg} border-l-4 {colors.border}">
+		<div class="flex-shrink-0 p-2.5 sm:p-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+			<svelte:component this={IconComponent} class="w-5 h-5 sm:w-6 sm:h-6 {colors.icon}" />
 		</div>
 		<div class="flex-1 min-w-0">
-			<div class="flex items-center gap-2 mb-1">
-				<span class="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+			<div class="flex items-center gap-2 mb-0.5 sm:mb-1">
+				<span class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
 					{tip.category}
 				</span>
 			</div>
-			<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{tip.title}</h3>
-			<p class="text-gray-600 dark:text-gray-300 leading-relaxed">{tip.message}</p>
+			<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-1 sm:mb-2">{tip.title}</h3>
+			<p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">{tip.message}</p>
 		</div>
 	</div>
 </Card>

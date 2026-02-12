@@ -111,13 +111,13 @@
 	}
 </script>
 
-<Card class="p-6">
-	<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
-	<div class="h-64">
+<Card class="p-4 sm:p-6">
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">{title}</h3>
+	<div class="h-48 sm:h-64">
 		{#if data.length > 0}
 			<canvas bind:this={canvas}></canvas>
 		{:else}
-			<div class="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
+			<div class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
 				Select an exercise to view progress
 			</div>
 		{/if}

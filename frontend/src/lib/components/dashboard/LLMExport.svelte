@@ -237,50 +237,51 @@ Please analyze my fitness data and provide:
 	}
 </script>
 
-<Button variant="secondary" on:click={handleExport} disabled={loading} class="gap-2">
+<Button variant="secondary" on:click={handleExport} disabled={loading} class="gap-1.5 sm:gap-2">
 	<MessageSquare class="w-4 h-4" />
-	{loading ? 'Loading...' : 'Export for AI'}
+	<span class="hidden sm:inline">{loading ? 'Loading...' : 'Export for AI'}</span>
+	<span class="sm:hidden">{loading ? '...' : 'AI'}</span>
 </Button>
 
 {#if showModal}
 <div
-	class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+	class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4"
 	on:click={closeModal}
 	on:keydown={(e) => e.key === 'Escape' && closeModal()}
 	role="dialog"
 	tabindex="-1"
 >
 	<div
-		class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col"
+		class="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[80vh] flex flex-col"
 		on:click|stopPropagation
 		on:keydown|stopPropagation
 		role="document"
 	>
-		<div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-			<h2 class="text-lg font-semibold text-gray-900 dark:text-white">AI-Ready Summary</h2>
+		<div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700/50">
+			<h2 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">AI-Ready Summary</h2>
 			<button
-				class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+				class="p-2 -mr-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
 				on:click={closeModal}
 			>
-				<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</button>
 		</div>
 
 		<div class="p-4 overflow-y-auto flex-1">
-			<pre class="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 rounded-lg p-4 whitespace-pre-wrap font-mono">{summary}</pre>
+			<pre class="text-xs sm:text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 sm:p-4 whitespace-pre-wrap font-mono leading-relaxed">{summary}</pre>
 		</div>
 
-		<div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-b-xl">
-			<p class="text-sm text-gray-500 dark:text-gray-400">Copy and paste into ChatGPT, Claude, or any AI</p>
-			<Button on:click={copyToClipboard} class="gap-2">
+		<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-t border-gray-100 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-900/50 rounded-b-2xl">
+			<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">Paste into ChatGPT, Claude, etc.</p>
+			<Button on:click={copyToClipboard} class="gap-2 w-full sm:w-auto justify-center">
 				{#if copied}
 					<Check class="w-4 h-4" />
 					Copied!
 				{:else}
 					<Copy class="w-4 h-4" />
-					Copy
+					Copy to Clipboard
 				{/if}
 			</Button>
 		</div>
