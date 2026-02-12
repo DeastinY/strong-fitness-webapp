@@ -2,11 +2,29 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+		<link rel="icon" href="/icon.svg" type="image/svg+xml" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#2563eb" />
+		<meta name="description" content="Track your workouts and monitor your fitness progress" />
+		<link rel="manifest" href="/manifest.json" />
+		<link rel="apple-touch-icon" href="/icon-192.png" />
 		%sveltekit.head%
+		<script>
+			// Initialize dark mode before page renders to prevent flash
+			const theme = localStorage.getItem('theme');
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			if (theme === 'dark' || (!theme && prefersDark)) {
+				document.documentElement.classList.add('dark');
+			}
+		</script>
 	</head>
-	<body data-sveltekit-preload-data="hover" class="bg-gray-50">
+	<body data-sveltekit-preload-data="hover" class="bg-gray-50 dark:bg-gray-900 transition-colors">
 		<div style="display: contents">%sveltekit.body%</div>
+		<script>
+			// Register service worker
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.register('/sw.js');
+			}
+		</script>
 	</body>
 </html>

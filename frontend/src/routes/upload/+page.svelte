@@ -73,29 +73,29 @@
 </svelte:head>
 
 <div class="space-y-6">
-	<h1 class="text-2xl font-bold text-gray-900">Upload CSV</h1>
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Upload CSV</h1>
 
 	{#if result}
 		<Card class="p-6">
 			<div class="text-center">
 				<CheckCircle class="w-12 h-12 mx-auto mb-4 text-green-500" />
-				<h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Complete</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upload Complete</h2>
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-					<div class="bg-gray-50 rounded-lg p-4">
-						<p class="text-2xl font-bold text-gray-900">{result.workouts_created}</p>
-						<p class="text-sm text-gray-500">Workouts Created</p>
+					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.workouts_created}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Workouts Created</p>
 					</div>
-					<div class="bg-gray-50 rounded-lg p-4">
-						<p class="text-2xl font-bold text-gray-900">{result.sets_created}</p>
-						<p class="text-sm text-gray-500">Sets Created</p>
+					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.sets_created}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Sets Created</p>
 					</div>
-					<div class="bg-gray-50 rounded-lg p-4">
-						<p class="text-2xl font-bold text-gray-900">{result.exercises_created}</p>
-						<p class="text-sm text-gray-500">Exercises Created</p>
+					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.exercises_created}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Exercises Created</p>
 					</div>
-					<div class="bg-gray-50 rounded-lg p-4">
-						<p class="text-2xl font-bold text-gray-900">{result.duplicates_skipped}</p>
-						<p class="text-sm text-gray-500">Duplicates Skipped</p>
+					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.duplicates_skipped}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Duplicates Skipped</p>
 					</div>
 				</div>
 				<div class="flex justify-center gap-4">
@@ -108,8 +108,8 @@
 		<Card class="p-6">
 			<div
 				class="border-2 border-dashed rounded-lg p-8 text-center transition-colors {dragOver
-					? 'border-blue-500 bg-blue-50'
-					: 'border-gray-300 hover:border-gray-400'}"
+					? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
+					: 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'}"
 				on:drop={handleDrop}
 				on:dragover={handleDragOver}
 				on:dragleave={handleDragLeave}
@@ -118,15 +118,15 @@
 			>
 				{#if file}
 					<FileText class="w-12 h-12 mx-auto mb-4 text-blue-500" />
-					<p class="text-lg font-medium text-gray-900">{file.name}</p>
-					<p class="text-sm text-gray-500 mb-4">{(file.size / 1024).toFixed(1)} KB</p>
+					<p class="text-lg font-medium text-gray-900 dark:text-white">{file.name}</p>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{(file.size / 1024).toFixed(1)} KB</p>
 					<Button variant="ghost" on:click={reset}>Choose Different File</Button>
 				{:else}
 					<Upload class="w-12 h-12 mx-auto mb-4 text-gray-400" />
-					<p class="text-lg font-medium text-gray-900 mb-2">
+					<p class="text-lg font-medium text-gray-900 dark:text-white mb-2">
 						Drag and drop your CSV file here
 					</p>
-					<p class="text-sm text-gray-500 mb-4">or</p>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">or</p>
 					<label>
 						<input
 							type="file"
@@ -146,19 +146,19 @@
 
 		{#if preview.length > 0}
 			<Card class="p-6">
-				<h2 class="text-lg font-semibold text-gray-900 mb-4">Preview</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview</h2>
 				<div class="overflow-x-auto">
-					<pre class="text-sm text-gray-600 bg-gray-50 rounded-lg p-4">{preview.join('\n')}</pre>
+					<pre class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">{preview.join('\n')}</pre>
 				</div>
 				{#if preview.length >= 6}
-					<p class="text-sm text-gray-500 mt-2">Showing first 5 rows...</p>
+					<p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Showing first 5 rows...</p>
 				{/if}
 			</Card>
 
 			{#if error}
-				<div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+				<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-start gap-3">
 					<AlertCircle class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-					<div class="text-red-700">{error}</div>
+					<div class="text-red-700 dark:text-red-400">{error}</div>
 				</div>
 			{/if}
 

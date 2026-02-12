@@ -10,21 +10,21 @@
 </script>
 
 <Card class="overflow-hidden">
-	<div class="px-6 py-4 border-b border-gray-200">
-		<h3 class="text-lg font-semibold text-gray-900">Recent Workouts</h3>
+	<div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+		<h3 class="text-lg font-semibold text-gray-900 dark:text-white">Recent Workouts</h3>
 	</div>
-	<div class="divide-y divide-gray-100">
+	<div class="divide-y divide-gray-100 dark:divide-gray-700">
 		{#each workouts as workout}
 			<a
 				href="/workouts"
-				class="block px-6 py-4 hover:bg-gray-50 transition-colors"
+				class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
 			>
 				<div class="flex items-center justify-between">
 					<div>
-						<p class="font-medium text-gray-900">{workout.name}</p>
-						<p class="text-sm text-gray-500">{formatDate(workout.date)}</p>
+						<p class="font-medium text-gray-900 dark:text-white">{workout.name}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">{formatDate(workout.date)}</p>
 					</div>
-					<div class="flex items-center gap-4 text-sm text-gray-500">
+					<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
 						<span class="flex items-center gap-1">
 							<Dumbbell class="w-4 h-4" />
 							{formatVolume(workout.total_volume, unit)} {unit}
@@ -41,7 +41,7 @@
 				</div>
 			</a>
 		{:else}
-			<div class="px-6 py-8 text-center text-gray-500">
+			<div class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
 				No workouts yet
 			</div>
 		{/each}

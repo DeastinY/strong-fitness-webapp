@@ -89,7 +89,7 @@
 
 <div class="space-y-6">
 	<div class="flex items-center justify-between">
-		<h1 class="text-2xl font-bold text-gray-900">Workout History</h1>
+		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Workout History</h1>
 		<UnitToggle bind:unit />
 	</div>
 
@@ -98,7 +98,7 @@
 			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
 		</div>
 	{:else if error}
-		<div class="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
 			{error}
 		</div>
 	{:else}
@@ -106,16 +106,16 @@
 			{#each workouts as workout (workout.id)}
 				<Card class="overflow-hidden">
 					<button
-						class="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors"
+						class="w-full px-6 py-4 text-left hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
 						on:click={() => toggleExpand(workout.id)}
 					>
 						<div class="flex items-center justify-between">
 							<div>
-								<p class="font-semibold text-gray-900">{workout.name}</p>
-								<p class="text-sm text-gray-500">{formatDateTime(workout.date)}</p>
+								<p class="font-semibold text-gray-900 dark:text-white">{workout.name}</p>
+								<p class="text-sm text-gray-500 dark:text-gray-400">{formatDateTime(workout.date)}</p>
 							</div>
 							<div class="flex items-center gap-6">
-								<div class="flex items-center gap-4 text-sm text-gray-500">
+								<div class="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
 									<span class="flex items-center gap-1">
 										<Dumbbell class="w-4 h-4" />
 										{formatVolume(workout.total_volume, unit)} {unit}
@@ -139,7 +139,7 @@
 					</button>
 
 					{#if expandedId === workout.id}
-						<div class="px-6 pb-4 border-t border-gray-100">
+						<div class="px-6 pb-4 border-t border-gray-100 dark:border-gray-700">
 							{#if loadingDetails}
 								<div class="py-8 flex justify-center">
 									<div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -148,25 +148,25 @@
 								<div class="mt-4 space-y-4">
 									{#each groupSetsByExercise(expandedWorkout.sets) as [exerciseName, sets]}
 										{@const category = sets[0]?.exercise?.category || 'other'}
-										<div class="bg-gray-50 rounded-lg p-4">
+										<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 											<div class="flex items-center gap-2 mb-3">
 												<span
 													class="w-2 h-2 rounded-full"
 													style="background-color: {getCategoryColor(category)}"
 												></span>
-												<h4 class="font-medium text-gray-900">{exerciseName}</h4>
-												<span class="text-xs text-gray-500 capitalize">({category})</span>
+												<h4 class="font-medium text-gray-900 dark:text-white">{exerciseName}</h4>
+												<span class="text-xs text-gray-500 dark:text-gray-400 capitalize">({category})</span>
 											</div>
 											<div class="grid grid-cols-4 gap-2 text-sm">
-												<div class="font-medium text-gray-500">Set</div>
-												<div class="font-medium text-gray-500">Weight</div>
-												<div class="font-medium text-gray-500">Reps</div>
-												<div class="font-medium text-gray-500">Volume</div>
+												<div class="font-medium text-gray-500 dark:text-gray-400">Set</div>
+												<div class="font-medium text-gray-500 dark:text-gray-400">Weight</div>
+												<div class="font-medium text-gray-500 dark:text-gray-400">Reps</div>
+												<div class="font-medium text-gray-500 dark:text-gray-400">Volume</div>
 												{#each sets as set}
-													<div class="text-gray-900">{set.set_order || '-'}</div>
-													<div class="text-gray-900">{formatWeight(set.weight_lbs, unit)}</div>
-													<div class="text-gray-900">{set.reps || '-'}</div>
-													<div class="text-gray-900">{formatVolume(set.volume, unit)} {unit}</div>
+													<div class="text-gray-900 dark:text-gray-200">{set.set_order || '-'}</div>
+													<div class="text-gray-900 dark:text-gray-200">{formatWeight(set.weight_lbs, unit)}</div>
+													<div class="text-gray-900 dark:text-gray-200">{set.reps || '-'}</div>
+													<div class="text-gray-900 dark:text-gray-200">{formatVolume(set.volume, unit)} {unit}</div>
 												{/each}
 											</div>
 										</div>

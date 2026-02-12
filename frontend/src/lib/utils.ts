@@ -51,9 +51,10 @@ export function formatDateTime(dateString: string): string {
 
 export function formatDuration(minutes: number | null): string {
 	if (minutes === null) return '-';
-	if (minutes < 60) return `${minutes}m`;
-	const hours = Math.floor(minutes / 60);
-	const mins = minutes % 60;
+	const rounded = Math.round(minutes);
+	if (rounded < 60) return `${rounded}m`;
+	const hours = Math.floor(rounded / 60);
+	const mins = rounded % 60;
 	return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
 }
 

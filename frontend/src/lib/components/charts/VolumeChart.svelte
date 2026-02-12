@@ -104,12 +104,12 @@
 </script>
 
 <Card class="p-6">
-	<h3 class="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+	<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">{title}</h3>
 	<div class="h-64">
 		{#if data.length > 0}
 			<canvas bind:this={canvas}></canvas>
 		{:else}
-			<div class="h-full flex items-center justify-center text-gray-500">
+			<div class="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
 				No data available
 			</div>
 		{/if}
