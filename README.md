@@ -11,12 +11,16 @@ Personal workout dashboard that visualizes gym data exported from a fitness trac
 ## Features
 
 - KPI cards: total workouts, training streak, total volume, avg session duration
-- Volume over time chart and muscle group breakdown
-- Per-exercise progress tracking with 1RM estimates
-- Workout calendar and session history
-- Body diagram highlighting trained muscle groups
-- Dark/light theme and kg/lbs unit toggle
+- Volume trend chart and muscle group breakdown with month-over-month trends
+- Volume per muscle group over time (monthly trend chart)
+- Workout calendar and 12-week consistency heatmap
+- Per-exercise progress tracking with 1RM estimates and last-session detail
+- All-time personal records table (sortable by weight or estimated 1RM)
+- Cardio tracking: distance and duration per session
+- Year filter to switch between years or view all time
+- AI export: compact 3-month training log for pasting into an LLM
 - CSV upload to add new workout data
+- Dark/light theme and kg/lbs unit toggle
 
 ## Data Format
 
@@ -26,18 +30,36 @@ The app ingests CSV exports with these columns:
 Date, Workout Name, Duration, Exercise Name, Set Order, Weight, Reps, Distance, Seconds, RPE
 ```
 
-`Set Order` accepts integers (`1`, `2`, `3`) or `F` for failure sets. On first startup the backend auto-seeds from `data.csv` if the database is empty.
+- `Set Order` accepts integers (`1`, `2`, `3`) or `F` for failure sets
+- `Distance` and `Seconds` are used for cardio exercises (e.g. Elliptical Machine)
+- `RPE` is optional (1–10 scale)
+- On first startup the backend auto-seeds from `data.csv` if the database is empty
 
-## Running Locally
+A sample file is provided at [`data.sample.csv`](data.sample.csv).
 
-### Docker (simplest)
+## Quick Install (no clone needed)
 
 ```bash
-cp .env.example .env          # set ORIGIN=http://localhost:3000
+# 1. Download the compose file
+curl -O https://raw.githubusercontent.com/DeastinY/strong-fitness-webapp/main/docker-compose.ghcr.yml
+
+# 2. Add your workout CSV (see data.sample.csv for the expected format)
+cp your-export.csv data.csv
+
+# 3. Run
+docker compose -f docker-compose.ghcr.yml up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000). Pre-built images are pulled from `ghcr.io` — no local build required.
+
+## Running Locally (from source)
+
+```bash
+cp data.sample.csv data.csv      # or use your own export
 docker compose up --build
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+To use your own data, replace `data.csv` before the first run (or while the DB volume is empty). You can also upload a CSV through the UI at any time.
 
 ### Python / Node (for development)
 
@@ -61,14 +83,14 @@ API_BACKEND=http://localhost:8000 npm run dev
 
 `API_BACKEND` tells the SvelteKit server where to proxy `/api/*` requests. Both services must be running at the same time.
 
-## Deployment
+## Deployment on TrueNAS SCALE
 
-See [DEPLOY.md](DEPLOY.md) for full instructions (TrueNAS / reverse proxy setup).
+See [DEPLOY.md](DEPLOY.md) for full instructions: dataset setup, pre-built image install, reverse proxy (Nginx Proxy Manager / Caddy), auto-start on boot, backup, and troubleshooting.
 
 ## Project Structure
 
 ```
-├── data.csv              # workout data (seeded into DB on first run)
+├── data.sample.csv       # example data format
 ├── docker-compose.yml
 ├── backend/
 │   └── app/
@@ -79,7 +101,11 @@ See [DEPLOY.md](DEPLOY.md) for full instructions (TrueNAS / reverse proxy setup)
 │           └── analytics.py
 └── frontend/
     └── src/
-        ├── routes/       # dashboard, workouts, exercises, upload
+        ├── routes/       # dashboard, workouts, exercises, records, upload
         └── lib/
+            ├── api.ts
+            ├── types.ts
             └── components/
+                ├── charts/
+                └── dashboard/
 ```

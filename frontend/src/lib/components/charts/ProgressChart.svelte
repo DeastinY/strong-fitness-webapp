@@ -79,6 +79,12 @@
 							label: ctx => {
 								const v = Math.round(ctx.parsed.y ?? 0);
 								return `${ctx.dataset.label}: ${v.toLocaleString()}`;
+							},
+							afterBody: ctx => {
+								const idx = ctx[0]?.dataIndex;
+								if (idx == null) return [];
+								const rpe = data[idx]?.avg_rpe;
+								return rpe != null ? [`Avg RPE: ${rpe}`] : [];
 							}
 						}
 					}
@@ -124,4 +130,16 @@
 			</div>
 		{/if}
 	</div>
+	{#if data.length > 0}
+		{@const rpePoints = data.filter(d => d.avg_rpe != null)}
+		{#if rpePoints.length > 0}
+			{@const latestRpe = rpePoints[rpePoints.length - 1].avg_rpe}
+			{@const avgRpe = rpePoints.reduce((s, d) => s + (d.avg_rpe ?? 0), 0) / rpePoints.length}
+			<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+				<span>RPE — latest: <span class="font-semibold text-gray-900 dark:text-white">{latestRpe}</span></span>
+				<span>avg: <span class="font-semibold text-gray-900 dark:text-white">{avgRpe.toFixed(1)}</span></span>
+				<span class="text-gray-400 dark:text-gray-600">({rpePoints.length}/{data.length} sessions tracked)</span>
+			</div>
+		{/if}
+	{/if}
 </Card>

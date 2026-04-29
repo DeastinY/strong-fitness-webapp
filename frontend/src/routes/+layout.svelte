@@ -2,7 +2,7 @@
 	import '../app.css';
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { Dumbbell, Home, History, LineChart, Upload, Menu, X } from 'lucide-svelte';
+	import { Dumbbell, Home, History, LineChart, Upload, Menu, X, Trophy } from 'lucide-svelte';
 	import { theme } from '$lib/stores/theme';
 	import ThemeToggle from '$lib/components/ui/ThemeToggle.svelte';
 
@@ -10,6 +10,7 @@
 		{ href: '/', label: 'Dashboard', icon: Home },
 		{ href: '/workouts', label: 'Workouts', icon: History },
 		{ href: '/exercises', label: 'Exercises', icon: LineChart },
+		{ href: '/records', label: 'Records', icon: Trophy },
 		{ href: '/upload', label: 'Upload', icon: Upload }
 	];
 

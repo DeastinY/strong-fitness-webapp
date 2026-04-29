@@ -1,40 +1,139 @@
-# Deploying Fitness Tracker on TrueNAS
+# Deploying on TrueNAS SCALE
 
 ## Architecture
 
-The app runs as two containers with internal API proxying:
-- **Frontend** (port 3000) - Serves the web app and proxies `/api/*` to backend
-- **Backend** (internal only) - FastAPI server, not exposed externally
+Two containers, one exposed port:
 
-You only need to expose **one port (3000)** to the outside world.
+| Container | Role | Exposed |
+|-----------|------|---------|
+| `fitness-frontend` | SvelteKit app + `/api/*` proxy | port 3000 |
+| `fitness-backend` | FastAPI + SQLite | internal only |
 
-## Quick Start
+Put a reverse proxy in front of port 3000 for HTTPS.
 
-### 1. Copy files to TrueNAS
+---
 
-```bash
-scp -r /path/to/fitness/* admin@YOUR_TRUENAS_IP:/mnt/YOUR_POOL/apps/fitness/
-```
+## 1. Create a Dataset
 
-### 2. Configure
+In the TrueNAS web UI, create a dataset to hold the SQLite database and your CSV file. This survives container rebuilds and is backed up with your pool.
 
-```bash
-ssh admin@YOUR_TRUENAS_IP
-cd /mnt/YOUR_POOL/apps/fitness
+**Storage → Pools → your pool → Add Dataset**
 
-# Create .env with your public URL
-echo "ORIGIN=https://fitness.yourdomain.com" > .env
-```
+Suggested path: `/mnt/POOL/fitness`
 
-### 3. Build and run
+Inside it, create two subdirectories via SSH:
 
 ```bash
-docker compose up -d --build
+mkdir -p /mnt/POOL/fitness/db
+mkdir -p /mnt/POOL/fitness/seed
 ```
 
-### 4. Configure reverse proxy
+Copy your workout CSV into the seed directory:
 
-Point your reverse proxy to port 3000. Example for **Nginx**:
+```bash
+cp your-export.csv /mnt/POOL/fitness/seed/data.csv
+```
+
+If you don't have data yet, use the sample:
+
+```bash
+curl -o /mnt/POOL/fitness/seed/data.csv \
+  https://raw.githubusercontent.com/DeastinY/strong-fitness-webapp/main/data.sample.csv
+```
+
+---
+
+## 2. Create the Compose File
+
+```bash
+mkdir -p /mnt/POOL/fitness
+cat > /mnt/POOL/fitness/docker-compose.yml << 'EOF'
+services:
+  backend:
+    image: ghcr.io/deastiny/strong-fitness-webapp-backend:latest
+    container_name: fitness-backend
+    restart: unless-stopped
+    expose:
+      - "8000"
+    volumes:
+      - /mnt/POOL/fitness/db:/app/data
+      - /mnt/POOL/fitness/seed/data.csv:/app/seed/data.csv:ro
+    environment:
+      - DATABASE_URL=sqlite:///./data/fitness.db
+      - SEED_CSV_PATH=/app/seed/data.csv
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    image: ghcr.io/deastiny/strong-fitness-webapp-frontend:latest
+    container_name: fitness-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      - ORIGIN=https://fitness.yourdomain.com
+      - API_BACKEND=http://backend:8000
+
+EOF
+```
+
+Replace `POOL` with your pool name and set `ORIGIN` to the URL you'll access the app from (or `http://TRUENAS_IP:3000` if not using a domain).
+
+---
+
+## 3. Start the App
+
+```bash
+cd /mnt/POOL/fitness
+docker compose pull
+docker compose up -d
+```
+
+Check it's running:
+
+```bash
+docker compose ps
+docker compose logs -f
+```
+
+The backend seeds the database from `data.csv` on first start (only if the DB is empty). After that, new data is added through the Upload page in the UI.
+
+---
+
+## 4. Reverse Proxy (HTTPS)
+
+You only need to proxy port 3000. Two common options on TrueNAS SCALE:
+
+### Option A — Nginx Proxy Manager (recommended)
+
+Install the **Nginx Proxy Manager** app from the TrueNAS app catalog, then add a proxy host:
+
+- **Domain:** `fitness.yourdomain.com`
+- **Scheme:** `http`
+- **Forward hostname:** IP of your TrueNAS (or `localhost` if NPM runs on the same host)
+- **Forward port:** `3000`
+- Enable **SSL** with Let's Encrypt
+
+### Option B — Caddy (manual, automatic HTTPS)
+
+```bash
+docker run -d \
+  --name caddy \
+  --network host \
+  -v /mnt/POOL/caddy/data:/data \
+  -v /mnt/POOL/caddy/config:/config \
+  caddy caddy reverse-proxy \
+    --from fitness.yourdomain.com \
+    --to localhost:3000
+```
+
+### Option C — Nginx (manual)
 
 ```nginx
 server {
@@ -55,68 +154,66 @@ server {
 }
 ```
 
-Example for **Caddy** (automatic HTTPS):
-
-```
-fitness.yourdomain.com {
-    reverse_proxy localhost:3000
-}
-```
-
-### 5. Access
-
-Open `https://fitness.yourdomain.com`
-
 ---
 
-## Data Persistence
+## 5. Auto-start on Boot
 
-Workout data is stored in the `fitness-data` Docker volume.
+TrueNAS SCALE does not automatically restart `docker compose` projects after a reboot unless you configure it. Add a startup script via **System → Init/Shutdown Scripts**:
 
-**Backup:**
-```bash
-docker run --rm -v fitness-data:/data -v $(pwd):/backup alpine tar czf /backup/fitness-backup.tar.gz -C /data .
-```
-
-**Restore:**
-```bash
-docker run --rm -v fitness-data:/data -v $(pwd):/backup alpine tar xzf /backup/fitness-backup.tar.gz -C /data
-```
+- **Type:** `Command`
+- **Command:** `docker compose -f /mnt/POOL/fitness/docker-compose.yml up -d`
+- **When:** `Post Init`
 
 ---
 
 ## Updating
 
 ```bash
-cd /mnt/YOUR_POOL/apps/fitness
-git pull  # or copy new files
+cd /mnt/POOL/fitness
+docker compose pull          # fetch latest images
+docker compose up -d         # recreate containers
+docker image prune -f        # clean up old layers
+```
+
+The database is stored in the dataset, not in the container, so updates never lose data.
+
+---
+
+## Backup and Restore
+
+**Backup the database:**
+
+```bash
+cp /mnt/POOL/fitness/db/fitness.db /mnt/POOL/fitness/fitness.db.bak
+```
+
+Or include it in your pool's ZFS snapshot schedule — it's just a file in the dataset.
+
+**Restore:**
+
+```bash
 docker compose down
-docker compose up -d --build
+cp /mnt/POOL/fitness/fitness.db.bak /mnt/POOL/fitness/db/fitness.db
+docker compose up -d
 ```
 
 ---
 
 ## Troubleshooting
 
-**Check logs:**
 ```bash
-docker compose logs -f
-docker compose logs frontend
-docker compose logs backend
-```
+# Tail all logs
+docker compose -f /mnt/POOL/fitness/docker-compose.yml logs -f
 
-**Check containers:**
-```bash
-docker compose ps
-```
+# Check backend health
+docker exec fitness-backend python -c \
+  "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/').read())"
 
-**Rebuild from scratch:**
-```bash
-docker compose down -v
-docker compose up -d --build
-```
+# Inspect the database
+docker exec fitness-backend sqlite3 /app/data/fitness.db ".tables"
 
-**Test API internally:**
-```bash
-docker compose exec frontend wget -qO- http://backend:8000/
+# Force re-seed (wipes existing data)
+docker compose down
+rm /mnt/POOL/fitness/db/fitness.db
+docker compose up -d
 ```

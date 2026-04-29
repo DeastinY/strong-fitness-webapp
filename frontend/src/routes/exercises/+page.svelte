@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Exercise, ExerciseProgress, ExercisePR, Unit } from '$lib/types';
-	import { getExercises, getExerciseProgress, getExercisePRs } from '$lib/api';
-	import { formatWeight, formatVolume } from '$lib/utils';
+	import type { Exercise, ExerciseProgress, ExercisePR, WorkoutWithSets, Unit } from '$lib/types';
+	import { getExercises, getExerciseProgress, getExercisePRs, getWorkouts, getWorkout } from '$lib/api';
+	import { formatWeight, formatVolume, formatDate } from '$lib/utils';
 	import { getExerciseTip, type ExerciseTip } from '$lib/exerciseTips';
 	import Card from '$lib/components/ui/Card.svelte';
 	import ExerciseSelector from '$lib/components/dashboard/ExerciseSelector.svelte';
@@ -10,12 +10,15 @@
 	import ProgressChart from '$lib/components/charts/ProgressChart.svelte';
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
 	import { Trophy, Dumbbell, Repeat, Target } from 'lucide-svelte';
+	import { yearFilter } from '$lib/stores/yearFilter';
+	import YearFilter from '$lib/components/ui/YearFilter.svelte';
 
 	let unit: Unit = 'lbs';
 	let exercises: Exercise[] = [];
 	let selectedExerciseId: number | null = null;
 	let progress: ExerciseProgress[] = [];
 	let prs: ExercisePR | null = null;
+	let lastSession: WorkoutWithSets | null = null;
 	let exerciseTip: ExerciseTip | null = null;
 	let loading = true;
 	let loadingProgress = false;
@@ -36,16 +39,28 @@
 	async function loadExerciseData(exerciseId: number) {
 		try {
 			loadingProgress = true;
-			const [progressResult, prsResult] = await Promise.all([
+			lastSession = null;
+			const [progressResult, prsResult, allWorkouts] = await Promise.all([
 				getExerciseProgress(exerciseId),
-				getExercisePRs(exerciseId)
+				getExercisePRs(exerciseId),
+				getWorkouts(0, 1000)
 			]);
 			progress = progressResult;
 			prs = prsResult;
+
+			// Find and fetch last session containing this exercise
+			if (progressResult.length > 0) {
+				const lastDate = progressResult[progressResult.length - 1].date.split('T')[0];
+				const matchingWorkout = allWorkouts.find(w => w.date.startsWith(lastDate));
+				if (matchingWorkout) {
+					lastSession = await getWorkout(matchingWorkout.id);
+				}
+			}
 		} catch (e) {
 			console.error(e);
 			progress = [];
 			prs = null;
+			lastSession = null;
 		} finally {
 			loadingProgress = false;
 		}
@@ -56,14 +71,19 @@
 	} else {
 		progress = [];
 		prs = null;
+		lastSession = null;
 	}
 
 	$: selectedExercise = exercises.find((e) => e.id === selectedExerciseId);
 	$: exerciseTip = selectedExercise ? getExerciseTip(selectedExercise.name) : null;
 
+	let initialized = false;
 	onMount(() => {
 		loadExercises();
+		initialized = true;
 	});
+
+	$: if (initialized && selectedExerciseId) $yearFilter, loadExerciseData(selectedExerciseId);
 </script>
 
 <svelte:head>
@@ -71,9 +91,12 @@
 </svelte:head>
 
 <div class="space-y-4 sm:space-y-6">
-	<div class="flex items-center justify-between">
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Exercises</h1>
-		<UnitToggle bind:unit />
+		<div class="flex items-center gap-2 sm:gap-3">
+			<YearFilter />
+			<UnitToggle bind:unit />
+		</div>
 	</div>
 
 	{#if loading}
@@ -167,6 +190,32 @@
 						</div>
 					{/if}
 				</div>
+
+				{#if lastSession && selectedExerciseId}
+					{@const exerciseSets = lastSession.sets.filter(s => s.exercise_id === selectedExerciseId)}
+					{#if exerciseSets.length > 0}
+						<Card class="p-4 sm:p-6">
+							<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">
+								Last Session <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">{formatDate(lastSession.date)}</span>
+							</h3>
+							{@const hasRpe = exerciseSets.some(s => s.rpe != null)}
+							<div class="grid gap-1.5 text-sm" style="grid-template-columns: repeat({hasRpe ? 5 : 4}, minmax(0, 1fr))">
+								<div class="font-medium text-gray-500 dark:text-gray-400 text-xs">Set</div>
+								<div class="font-medium text-gray-500 dark:text-gray-400 text-xs">Weight</div>
+								<div class="font-medium text-gray-500 dark:text-gray-400 text-xs">Reps</div>
+								<div class="font-medium text-gray-500 dark:text-gray-400 text-xs">Vol</div>
+								{#if hasRpe}<div class="font-medium text-gray-500 dark:text-gray-400 text-xs">RPE</div>{/if}
+								{#each exerciseSets as set}
+									<div class="text-gray-900 dark:text-gray-200">{set.set_order || '-'}</div>
+									<div class="text-gray-900 dark:text-gray-200">{formatWeight(set.weight_lbs, unit)}</div>
+									<div class="text-gray-900 dark:text-gray-200">{set.reps || '-'}</div>
+									<div class="text-gray-900 dark:text-gray-200">{formatVolume(set.volume, unit)}</div>
+									{#if hasRpe}<div class="text-gray-900 dark:text-gray-200">{set.rpe ?? '-'}</div>{/if}
+								{/each}
+							</div>
+						</Card>
+					{/if}
+				{/if}
 			{/if}
 		{:else}
 			<Card class="p-12">

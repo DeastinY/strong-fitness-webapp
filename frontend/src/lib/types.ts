@@ -52,6 +52,7 @@ export interface ExerciseProgress {
 	best_weight: number;
 	best_volume: number;
 	total_volume: number;
+	avg_rpe: number | null;
 }
 
 export interface ExercisePR {
@@ -64,6 +65,21 @@ export interface ExercisePR {
 export interface CategoryVolume {
 	category: string;
 	volume: number;
+}
+
+export interface ExercisePRSummary {
+	exercise_id: number;
+	exercise_name: string;
+	best_weight: number;
+	best_reps: number;
+	best_estimated_1rm: number;
+	best_weight_date: string | null;
+}
+
+export interface CardioDataPoint {
+	date: string;
+	distance_km: number;
+	seconds: number;
 }
 
 export interface UploadResult {

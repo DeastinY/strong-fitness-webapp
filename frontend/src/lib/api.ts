@@ -2,6 +2,8 @@ import type {
 	KPIStats,
 	VolumeDataPoint,
 	CategoryVolume,
+	CardioDataPoint,
+	ExercisePRSummary,
 	WorkoutSummary,
 	WorkoutWithSets,
 	Exercise,
@@ -9,15 +11,16 @@ import type {
 	ExercisePR,
 	UploadResult
 } from './types';
+import { get } from 'svelte/store';
+import { yearFilter } from './stores/yearFilter';
 
 // Use /api prefix - proxied to backend by SvelteKit server
 const API_URL = '/api';
 
-// Filter year - change this to show different years
-const FILTER_YEAR = 2026;
-
 function isInYear(dateStr: string): boolean {
-	return new Date(dateStr).getFullYear() === FILTER_YEAR;
+	const year = get(yearFilter);
+	if (year === null) return true;
+	return new Date(dateStr).getFullYear() === year;
 }
 
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -191,6 +194,15 @@ export async function getExercisePRs(exerciseId: number): Promise<ExercisePR> {
 		best_reps: bestReps,
 		best_estimated_1rm: best1RM
 	};
+}
+
+export async function getAllPRs(): Promise<ExercisePRSummary[]> {
+	return fetchApi<ExercisePRSummary[]>('/stats/prs');
+}
+
+export async function getCardioStats(): Promise<CardioDataPoint[]> {
+	const data = await fetchApi<CardioDataPoint[]>('/stats/cardio');
+	return data.filter(d => isInYear(d.date));
 }
 
 export async function uploadCSV(file: File): Promise<UploadResult> {

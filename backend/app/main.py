@@ -10,9 +10,11 @@ from .services.analytics import (
     calculate_kpi_stats,
     get_volume_over_time,
     get_volume_by_category,
+    get_cardio_over_time,
+    get_all_exercise_prs,
 )
 from .services.csv_parser import parse_csv_data
-from .schemas import KPIStats, VolumeDataPoint, CategoryVolume
+from .schemas import KPIStats, VolumeDataPoint, CategoryVolume, CardioDataPoint, ExercisePRSummary
 
 Base.metadata.create_all(bind=engine)
 
@@ -67,3 +69,13 @@ def get_volume_stats(db: Session = Depends(get_db)):
 @app.get("/stats/categories", response_model=list[CategoryVolume])
 def get_category_stats(db: Session = Depends(get_db)):
     return get_volume_by_category(db)
+
+
+@app.get("/stats/cardio", response_model=list[CardioDataPoint])
+def get_cardio_stats(db: Session = Depends(get_db)):
+    return get_cardio_over_time(db)
+
+
+@app.get("/stats/prs", response_model=list[ExercisePRSummary])
+def get_prs(db: Session = Depends(get_db)):
+    return get_all_exercise_prs(db)

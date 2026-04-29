@@ -7,7 +7,9 @@ from ..schemas import (
     VolumeDataPoint,
     ExerciseProgress,
     ExercisePR,
+    ExercisePRSummary,
     CategoryVolume,
+    CardioDataPoint,
 )
 
 
@@ -99,6 +101,7 @@ def get_exercise_progress(db: Session, exercise_id: int) -> list[ExerciseProgres
             func.max(Set.weight_lbs).label("best_weight"),
             func.max(Set.weight_lbs * Set.reps).label("best_volume"),
             func.sum(Set.weight_lbs * Set.reps).label("total_volume"),
+            func.avg(Set.rpe).label("avg_rpe"),
         )
         .join(Set)
         .filter(
@@ -117,6 +120,7 @@ def get_exercise_progress(db: Session, exercise_id: int) -> list[ExerciseProgres
             best_weight=round(r.best_weight, 2),
             best_volume=round(r.best_volume, 2),
             total_volume=round(r.total_volume, 2),
+            avg_rpe=round(r.avg_rpe, 1) if r.avg_rpe is not None else None,
         )
         for r in results
     ]
@@ -169,6 +173,76 @@ def get_exercise_prs(db: Session, exercise_id: int) -> ExercisePR:
         best_reps=round(best_reps, 2),
         best_estimated_1rm=round(best_1rm, 2),
     )
+
+
+def get_all_exercise_prs(db: Session) -> list[ExercisePRSummary]:
+    # Aggregate best weight, reps, and 1RM per exercise
+    agg = (
+        db.query(
+            Exercise.id.label("exercise_id"),
+            Exercise.name.label("exercise_name"),
+            func.max(Set.weight_lbs).label("best_weight"),
+            func.max(Set.reps).label("best_reps"),
+        )
+        .join(Set)
+        .filter(Set.weight_lbs.isnot(None), Set.reps.isnot(None))
+        .group_by(Exercise.id)
+        .order_by(Exercise.name)
+        .all()
+    )
+
+    results = []
+    for r in agg:
+        best_1rm = r.best_weight * (1 + r.best_reps / 30) if r.best_weight and r.best_reps else 0
+
+        # Find the date when best weight was achieved
+        best_set = (
+            db.query(Workout.date)
+            .join(Set)
+            .filter(Set.exercise_id == r.exercise_id, Set.weight_lbs == r.best_weight)
+            .order_by(Workout.date.asc())
+            .first()
+        )
+
+        results.append(ExercisePRSummary(
+            exercise_id=r.exercise_id,
+            exercise_name=r.exercise_name,
+            best_weight=round(r.best_weight, 2),
+            best_reps=round(r.best_reps, 2),
+            best_estimated_1rm=round(best_1rm, 2),
+            best_weight_date=best_set.date if best_set else None,
+        ))
+
+    return results
+
+
+def get_cardio_over_time(db: Session) -> list[CardioDataPoint]:
+    results = (
+        db.query(
+            Workout.date,
+            func.sum(Set.distance).label("distance_km"),
+            func.sum(Set.seconds).label("seconds"),
+        )
+        .join(Set)
+        .join(Exercise)
+        .filter(
+            Exercise.category == "cardio",
+            Set.distance.isnot(None),
+            Set.seconds.isnot(None),
+        )
+        .group_by(Workout.id)
+        .order_by(Workout.date)
+        .all()
+    )
+
+    return [
+        CardioDataPoint(
+            date=r.date,
+            distance_km=round(r.distance_km, 2),
+            seconds=round(r.seconds, 0),
+        )
+        for r in results
+    ]
 
 
 def get_volume_by_category(db: Session) -> list[CategoryVolume]:

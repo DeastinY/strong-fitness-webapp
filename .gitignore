@@ -13,6 +13,9 @@ ENV/
 *.db
 *.db-journal
 
+# Personal workout data — mount your own at runtime via docker-compose volume
+data.csv
+
 # Node.js
 node_modules/
 npm-debug.log*

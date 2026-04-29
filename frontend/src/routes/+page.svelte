@@ -1,21 +1,26 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { KPIStats, VolumeDataPoint, CategoryVolume, WorkoutSummary, WorkoutWithSets, Unit } from '$lib/types';
-	import { getKPIStats, getVolumeStats, getCategoryStats, getWorkouts, getWorkout } from '$lib/api';
+	import type { KPIStats, VolumeDataPoint, CategoryVolume, CardioDataPoint, WorkoutSummary, WorkoutWithSets, Unit } from '$lib/types';
+	import { getKPIStats, getVolumeStats, getCategoryStats, getCardioStats, getWorkouts, getWorkout } from '$lib/api';
 	import { formatVolume, formatDuration } from '$lib/utils';
+	import { yearFilter } from '$lib/stores/yearFilter';
 	import KpiCard from '$lib/components/dashboard/KpiCard.svelte';
 	import VolumeChart from '$lib/components/charts/VolumeChart.svelte';
 	import MuscleGroupChart from '$lib/components/charts/MuscleGroupChart.svelte';
+	import MuscleGroupTrendChart from '$lib/components/charts/MuscleGroupTrendChart.svelte';
+	import CardioChart from '$lib/components/charts/CardioChart.svelte';
 	import WorkoutCalendar from '$lib/components/dashboard/WorkoutCalendar.svelte';
 	import ConsistencyScore from '$lib/components/dashboard/ConsistencyScore.svelte';
 	import LLMExport from '$lib/components/dashboard/LLMExport.svelte';
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
+	import YearFilter from '$lib/components/ui/YearFilter.svelte';
 	import { Activity, Flame, Dumbbell, Clock } from 'lucide-svelte';
 
 	let unit: Unit = 'lbs';
 	let kpi: KPIStats | null = null;
 	let volumeData: VolumeDataPoint[] = [];
 	let categoryData: CategoryVolume[] = [];
+	let cardioData: CardioDataPoint[] = [];
 	let allWorkouts: WorkoutSummary[] = [];
 	let workoutDetails: WorkoutWithSets[] = [];
 	let loading = true;
@@ -25,19 +30,21 @@
 		try {
 			loading = true;
 			error = null;
-			const [kpiResult, volumeResult, categoryResult, allWorkoutsResult] = await Promise.all([
+			const [kpiResult, volumeResult, categoryResult, cardioResult, allWorkoutsResult] = await Promise.all([
 				getKPIStats(),
 				getVolumeStats(),
 				getCategoryStats(),
+				getCardioStats(),
 				getWorkouts(0, 100)
 			]);
 			kpi = kpiResult;
 			volumeData = volumeResult;
 			categoryData = categoryResult;
+			cardioData = cardioResult;
 			allWorkouts = allWorkoutsResult;
 
-			// Fetch workout details for muscle group progress (last 30 workouts for 2-month window)
-			const detailsToFetch = allWorkoutsResult.slice(0, 30);
+			// Fetch workout details for muscle group progress and trend chart
+			const detailsToFetch = allWorkoutsResult.slice(0, 60);
 			workoutDetails = await Promise.all(detailsToFetch.map(w => getWorkout(w.id)));
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to load data';
@@ -47,9 +54,13 @@
 		}
 	}
 
+	let initialized = false;
 	onMount(() => {
 		loadData();
+		initialized = true;
 	});
+
+	$: if (initialized) $yearFilter, loadData();
 </script>
 
 <svelte:head>
@@ -63,6 +74,7 @@
 			{#if kpi}
 				<LLMExport {kpi} recentWorkouts={allWorkouts} />
 			{/if}
+			<YearFilter />
 			<UnitToggle bind:unit />
 		</div>
 	</div>
@@ -97,5 +109,11 @@
 			<WorkoutCalendar workouts={allWorkouts} />
 			<MuscleGroupChart data={categoryData} {unit} title="Muscle Groups" {workoutDetails} />
 		</div>
+
+		<MuscleGroupTrendChart {workoutDetails} {unit} />
+
+		{#if cardioData.length > 0}
+			<CardioChart data={cardioData} />
+		{/if}
 	{/if}
 </div>

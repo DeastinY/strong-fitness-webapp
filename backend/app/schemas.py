@@ -90,6 +90,7 @@ class ExerciseProgress(BaseModel):
     best_weight: float
     best_volume: float
     total_volume: float
+    avg_rpe: Optional[float] = None
 
 
 class ExercisePR(BaseModel):
@@ -102,6 +103,21 @@ class ExercisePR(BaseModel):
 class CategoryVolume(BaseModel):
     category: str
     volume: float
+
+
+class ExercisePRSummary(BaseModel):
+    exercise_id: int
+    exercise_name: str
+    best_weight: float
+    best_reps: float
+    best_estimated_1rm: float
+    best_weight_date: Optional[datetime] = None
+
+
+class CardioDataPoint(BaseModel):
+    date: datetime
+    distance_km: float
+    seconds: float
 
 
 class UploadResult(BaseModel):

@@ -8,6 +8,8 @@
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
 	import WorkoutConsistencyCharts from '$lib/components/charts/WorkoutConsistencyCharts.svelte';
 	import { ChevronDown, ChevronUp, Dumbbell, Clock, Layers } from 'lucide-svelte';
+	import { yearFilter } from '$lib/stores/yearFilter';
+	import YearFilter from '$lib/components/ui/YearFilter.svelte';
 
 	let unit: Unit = 'lbs';
 	let allWorkouts: WorkoutSummary[] = [];
@@ -74,9 +76,13 @@
 		return Object.entries(grouped);
 	}
 
+	let initialized = false;
 	onMount(() => {
 		loadWorkouts();
+		initialized = true;
 	});
+
+	$: if (initialized) $yearFilter, loadWorkouts();
 </script>
 
 <svelte:head>
@@ -84,9 +90,12 @@
 </svelte:head>
 
 <div class="space-y-4 sm:space-y-6">
-	<div class="flex items-center justify-between">
+	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Workouts</h1>
-		<UnitToggle bind:unit />
+		<div class="flex items-center gap-2 sm:gap-3">
+			<YearFilter />
+			<UnitToggle bind:unit />
+		</div>
 	</div>
 
 	{#if loading}
@@ -153,6 +162,7 @@
 								<div class="mt-3 sm:mt-4 space-y-3 sm:space-y-4">
 									{#each groupSetsByExercise(expandedWorkout.sets) as [exerciseName, sets]}
 										{@const category = sets[0]?.exercise?.category || 'other'}
+										{@const hasRpe = sets.some(s => s.rpe != null)}
 										<div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-3 sm:p-4">
 											<div class="flex items-center gap-2 mb-2 sm:mb-3">
 												<span
@@ -161,16 +171,18 @@
 												></span>
 												<h4 class="font-medium text-sm sm:text-base text-gray-900 dark:text-white">{exerciseName}</h4>
 											</div>
-											<div class="grid grid-cols-4 gap-1.5 sm:gap-2 text-xs sm:text-sm">
+											<div class="grid gap-1.5 sm:gap-2 text-xs sm:text-sm" style="grid-template-columns: repeat({hasRpe ? 5 : 4}, minmax(0, 1fr))">
 												<div class="font-medium text-gray-500 dark:text-gray-400">Set</div>
 												<div class="font-medium text-gray-500 dark:text-gray-400">Weight</div>
 												<div class="font-medium text-gray-500 dark:text-gray-400">Reps</div>
 												<div class="font-medium text-gray-500 dark:text-gray-400">Vol</div>
+												{#if hasRpe}<div class="font-medium text-gray-500 dark:text-gray-400">RPE</div>{/if}
 												{#each sets as set}
 													<div class="text-gray-900 dark:text-gray-200">{set.set_order || '-'}</div>
 													<div class="text-gray-900 dark:text-gray-200">{formatWeight(set.weight_lbs, unit)}</div>
 													<div class="text-gray-900 dark:text-gray-200">{set.reps || '-'}</div>
 													<div class="text-gray-900 dark:text-gray-200">{formatVolume(set.volume, unit)}</div>
+													{#if hasRpe}<div class="text-gray-900 dark:text-gray-200">{set.rpe ?? '-'}</div>{/if}
 												{/each}
 											</div>
 										</div>
