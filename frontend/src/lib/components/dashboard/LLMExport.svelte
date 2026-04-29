@@ -1,222 +1,108 @@
 <script lang="ts">
-	import type { KPIStats, VolumeDataPoint, CategoryVolume, WorkoutSummary, WorkoutWithSets } from '$lib/types';
+	import type { KPIStats, WorkoutSummary, WorkoutWithSets } from '$lib/types';
 	import { getWorkout } from '$lib/api';
 	import { Copy, Check, MessageSquare } from 'lucide-svelte';
 	import Button from '../ui/Button.svelte';
 
 	export let kpi: KPIStats;
-	export let volumeData: VolumeDataPoint[];
-	export let categoryData: CategoryVolume[];
 	export let recentWorkouts: WorkoutSummary[];
 
 	let copied = false;
 	let showModal = false;
 	let summary = '';
 	let loading = false;
-	let workoutDetails: WorkoutWithSets[] = [];
 
-	interface ExerciseProgress {
-		name: string;
-		sessions: Array<{
-			date: string;
-			sets: Array<{ weight: number | null; reps: number | null }>;
-			totalVolume: number;
-			maxWeight: number;
-		}>;
+	function fmtDate(dateStr: string): string {
+		return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 	}
 
-	function calculateExerciseProgress(workouts: WorkoutWithSets[]): ExerciseProgress[] {
-		const exerciseMap = new Map<string, ExerciseProgress>();
-
-		for (const workout of workouts) {
-			const dateStr = new Date(workout.date).toLocaleDateString();
-
-			// Group sets by exercise for this workout
-			const exerciseSets = new Map<string, Array<{ weight: number | null; reps: number | null }>>();
-
-			for (const set of workout.sets) {
-				const name = set.exercise?.name || 'Unknown';
-				if (!exerciseSets.has(name)) {
-					exerciseSets.set(name, []);
-				}
-				exerciseSets.get(name)!.push({
-					weight: set.weight_lbs,
-					reps: set.reps
-				});
-			}
-
-			// Add to exercise progress
-			for (const [name, sets] of exerciseSets) {
-				if (!exerciseMap.has(name)) {
-					exerciseMap.set(name, { name, sessions: [] });
-				}
-
-				const totalVolume = sets.reduce((sum, s) => sum + ((s.weight || 0) * (s.reps || 0)), 0);
-				const maxWeight = Math.max(...sets.map(s => s.weight || 0));
-
-				exerciseMap.get(name)!.sessions.push({
-					date: dateStr,
-					sets,
-					totalVolume,
-					maxWeight
-				});
-			}
-		}
-
-		return Array.from(exerciseMap.values());
-	}
-
-	function formatExerciseProgress(progress: ExerciseProgress[]): string {
+	function formatWorkoutLog(workouts: WorkoutWithSets[]): string {
 		const lines: string[] = [];
 
-		for (const exercise of progress) {
-			if (exercise.name === 'Elliptical Machine') continue; // Skip cardio
+		const sorted = [...workouts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-			lines.push(`\n${exercise.name}:`);
+		for (const workout of sorted) {
+			const dur = workout.duration_minutes ? ` (${workout.duration_minutes}min)` : '';
+			lines.push(`${fmtDate(workout.date)}${dur}`);
 
-			const sessions = exercise.sessions.slice(0, 5); // Last 5 sessions
+			// Group sets by exercise, preserving encounter order
+			const exerciseOrder: string[] = [];
+			const exerciseSets = new Map<string, typeof workout.sets>();
 
-			for (let i = 0; i < sessions.length; i++) {
-				const session = sessions[i];
-				const setsStr = session.sets
-					.map(s => s.weight ? `${s.weight}x${s.reps}` : `${s.reps}r`)
-					.join(', ');
-
-				let changeStr = '';
-				if (i < sessions.length - 1) {
-					const prevSession = sessions[i + 1];
-					if (prevSession.totalVolume > 0 && session.totalVolume > 0) {
-						const volumeChange = ((session.totalVolume - prevSession.totalVolume) / prevSession.totalVolume) * 100;
-						if (Math.abs(volumeChange) >= 1) {
-							changeStr = volumeChange > 0 ? ` [+${volumeChange.toFixed(0)}%]` : ` [${volumeChange.toFixed(0)}%]`;
-						}
-					}
+			for (const set of workout.sets) {
+				const name = set.exercise?.name ?? 'Unknown';
+				if (!exerciseSets.has(name)) {
+					exerciseSets.set(name, []);
+					exerciseOrder.push(name);
 				}
-
-				lines.push(`  ${session.date}: ${setsStr} (vol: ${session.totalVolume})${changeStr}`);
+				exerciseSets.get(name)!.push(set);
 			}
 
-			// Overall progress from first to last
-			if (sessions.length >= 2) {
-				const first = sessions[sessions.length - 1];
-				const last = sessions[0];
+			for (const name of exerciseOrder) {
+				const sets = exerciseSets.get(name)!;
+				const category = sets[0].exercise?.category;
 
-				if (first.totalVolume > 0) {
-					const totalChange = ((last.totalVolume - first.totalVolume) / first.totalVolume) * 100;
-					const weightChange = first.maxWeight > 0
-						? ((last.maxWeight - first.maxWeight) / first.maxWeight) * 100
-						: 0;
-
-					lines.push(`  → Overall: volume ${totalChange >= 0 ? '+' : ''}${totalChange.toFixed(0)}%, max weight ${weightChange >= 0 ? '+' : ''}${weightChange.toFixed(0)}%`);
+				if (category === 'cardio') {
+					const s = sets[0];
+					const parts: string[] = [];
+					if (s.distance) parts.push(`${s.distance}km`);
+					if (s.seconds) parts.push(`${s.seconds}s`);
+					lines.push(`  ${name}: ${parts.join(' / ')}`);
+				} else {
+					const setsStr = sets
+						.map(s => {
+							const w = s.weight_lbs != null ? Math.round(s.weight_lbs) : null;
+							const r = s.reps != null ? Math.round(s.reps) : null;
+							const fail = s.set_order === 'F' ? 'F' : '';
+							if (w && r) return `${w}×${r}${fail}`;
+							if (r) return `${r}r${fail}`;
+							return '?';
+						})
+						.join(', ');
+					lines.push(`  ${name}: ${setsStr}`);
 				}
 			}
+
+			lines.push('');
 		}
 
-		return lines.join('\n');
+		return lines.join('\n').trimEnd();
 	}
 
-	async function generateSummary(): Promise<string> {
-		// Data is already filtered to 2026 by the API
-		const totalVolume = volumeData.reduce((sum, v) => sum + v.volume, 0);
-		const avgVolume = volumeData.length > 0
-			? Math.round(totalVolume / volumeData.length)
-			: 0;
+	async function generateSummary(workouts: WorkoutWithSets[]): Promise<string> {
+		const now = new Date();
+		const threeMonthsAgo = new Date(now);
+		threeMonthsAgo.setMonth(now.getMonth() - 3);
 
-		// Calculate trend
-		let trend = 'stable';
-		let trendDetail = '';
-		if (volumeData.length >= 6) {
-			const recent = volumeData.slice(-3).reduce((sum, v) => sum + v.volume, 0) / 3;
-			const previous = volumeData.slice(-6, -3).reduce((sum, v) => sum + v.volume, 0) / 3;
-			const change = ((recent - previous) / previous) * 100;
-			if (change > 10) {
-				trend = 'increasing';
-				trendDetail = `+${change.toFixed(0)}% vs previous 3 workouts`;
-			} else if (change < -10) {
-				trend = 'decreasing';
-				trendDetail = `${change.toFixed(0)}% vs previous 3 workouts`;
-			}
-		}
+		const dateOpts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+		const start = threeMonthsAgo.toLocaleDateString('en-US', dateOpts);
+		const end = now.toLocaleDateString('en-US', dateOpts);
 
-		// Category breakdown
-		const totalCatVolume = categoryData.reduce((sum, c) => sum + c.volume, 0);
-		const categories = categoryData
-			.sort((a, b) => b.volume - a.volume)
-			.map(c => `${c.category}: ${((c.volume / totalCatVolume) * 100).toFixed(0)}%`)
-			.join(', ');
+		const header = [
+			`TRAINING LOG — last 3 months`,
+			`${start} to ${end} | ${workouts.length} sessions | avg ${Math.round(kpi.avg_duration)} min | streak: ${kpi.current_streak} weeks`,
+			`31yo male, mostly sedentary, returned to training Jan 2026`,
+			``,
+			`---`,
+			``
+		].join('\n');
 
-		// Workout frequency
-		const dates = recentWorkouts.map(w => new Date(w.date));
-		let avgDaysBetween = 0;
-		if (dates.length >= 2) {
-			const diffs = [];
-			for (let i = 1; i < dates.length; i++) {
-				diffs.push((dates[i-1].getTime() - dates[i].getTime()) / (1000 * 60 * 60 * 24));
-			}
-			avgDaysBetween = diffs.reduce((a, b) => a + b, 0) / diffs.length;
-		}
-
-		// Date range
-		const firstDate = volumeData.length > 0 ? new Date(volumeData[0].date).toLocaleDateString() : 'N/A';
-		const lastDate = volumeData.length > 0 ? new Date(volumeData[volumeData.length - 1].date).toLocaleDateString() : 'N/A';
-
-		// Exercise progress
-		const exerciseProgress = calculateExerciseProgress(workoutDetails);
-		const progressStr = formatExerciseProgress(exerciseProgress);
-
-		// Volume progression over time
-		const volumeProgression = volumeData.length >= 2
-			? ((volumeData[volumeData.length - 1].volume - volumeData[0].volume) / volumeData[0].volume) * 100
-			: 0;
-
-		return `FITNESS DATA SUMMARY
-====================
-
-ABOUT ME
-31 year old male, mostly sedentary lifestyle, started training again this year.
-
-TRAINING OVERVIEW (2026 only)
-Period: ${firstDate} to ${lastDate}
-Total workouts: ${recentWorkouts.length}
-Weekly streak: ${kpi.current_streak} weeks
-Avg duration: ${Math.round(kpi.avg_duration)} min
-Frequency: every ${avgDaysBetween.toFixed(1)} days
-
-VOLUME STATS (lbs)
-Total lifted: ${Math.round(totalVolume).toLocaleString()}
-Avg per workout: ${avgVolume.toLocaleString()}
-First workout volume: ${volumeData.length > 0 ? Math.round(volumeData[0].volume).toLocaleString() : 'N/A'}
-Latest workout volume: ${volumeData.length > 0 ? Math.round(volumeData[volumeData.length - 1].volume).toLocaleString() : 'N/A'}
-Overall progression: ${volumeProgression >= 0 ? '+' : ''}${volumeProgression.toFixed(0)}%
-Recent trend: ${trend}${trendDetail ? ` (${trendDetail})` : ''}
-
-MUSCLE DISTRIBUTION
-${categories}
-
-EXERCISE PROGRESS (last 5 sessions, weight x reps)
-${progressStr}
-
----
-Please analyze my fitness data and provide:
-1. Assessment of my current progress and consistency
-2. Which exercises show good/poor progression
-3. Recommendations for weights/reps adjustments
-4. Any muscle imbalances or concerns`;
+		return header + formatWorkoutLog(workouts);
 	}
 
 	async function handleExport() {
 		loading = true;
 		try {
-			// Fetch details for recent workouts (up to 10) - already filtered to 2026 by API
-			const fetchCount = Math.min(recentWorkouts.length, 10);
-			const details = await Promise.all(
-				recentWorkouts.slice(0, fetchCount).map(w => getWorkout(w.id))
-			);
-			workoutDetails = details;
-			summary = await generateSummary();
+			const threeMonthsAgo = new Date();
+			threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+			const inRange = recentWorkouts.filter(w => new Date(w.date) >= threeMonthsAgo);
+			const details = await Promise.all(inRange.map(w => getWorkout(w.id)));
+
+			summary = await generateSummary(details);
 			showModal = true;
 		} catch (err) {
-			console.error('Failed to generate summary:', err);
+			console.error('Failed to generate export:', err);
 		} finally {
 			loading = false;
 		}

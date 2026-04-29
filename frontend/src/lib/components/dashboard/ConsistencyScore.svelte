@@ -152,23 +152,34 @@
 
 	{#if consistency.weeks.length > 0}
 		<div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 dark:border-gray-700/50">
-			<div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-1.5 sm:mb-2">Last 12 weeks</div>
-			<div class="flex gap-0.5 sm:gap-1">
+			<div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2">Last 12 weeks</div>
+			<div class="flex gap-1">
 				{#each consistency.weeks.slice(-12) as week}
+					{@const c = week.count}
 					<div
-						class="flex-1 h-6 sm:h-8 rounded-sm sm:rounded transition-colors
-							{week.count >= targetPerWeek
-								? 'bg-green-500 dark:bg-green-500'
-								: week.count > 0
-									? 'bg-yellow-400 dark:bg-yellow-500'
-									: 'bg-gray-200 dark:bg-gray-700'}"
-						title="{week.weekStart.toLocaleDateString()}: {week.count} workouts"
-					></div>
+						class="flex-1 h-9 sm:h-10 rounded flex items-center justify-center text-[10px] font-semibold transition-colors
+							{c === 0
+								? 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600'
+								: c === 1
+									? 'bg-amber-200 dark:bg-amber-900 text-amber-700 dark:text-amber-400'
+									: c === 2
+										? 'bg-amber-400 dark:bg-amber-600 text-amber-900 dark:text-amber-100'
+										: 'bg-green-500 dark:bg-green-500 text-white'}"
+						title="w/o {week.weekStart.toLocaleDateString()}: {c} workout{c !== 1 ? 's' : ''}"
+					>{c > 0 ? c : ''}</div>
 				{/each}
 			</div>
-			<div class="flex justify-between text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 mt-1">
+			<div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mt-1 mb-2.5">
 				<span>12w ago</span>
 				<span>Now</span>
+			</div>
+			<!-- Legend -->
+			<div class="flex items-center gap-2 flex-wrap text-[10px] text-gray-500 dark:text-gray-400">
+				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-gray-100 dark:bg-gray-800"></div>0</div>
+				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-amber-200 dark:bg-amber-900"></div>1</div>
+				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-amber-400 dark:bg-amber-600"></div>2</div>
+				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-green-500"></div>3+</div>
+				<span class="ml-auto text-gray-400">sessions/week</span>
 			</div>
 		</div>
 	{/if}

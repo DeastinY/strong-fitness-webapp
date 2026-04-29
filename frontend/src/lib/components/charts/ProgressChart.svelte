@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Chart, registerables, type ChartConfiguration } from 'chart.js';
+	import { Chart, registerables } from 'chart.js';
 	import type { ExerciseProgress } from '$lib/types';
 	import type { Unit } from '$lib/types';
-	import { convertWeight, formatDate } from '$lib/utils';
+	import { convertWeight } from '$lib/utils';
 	import Card from '../ui/Card.svelte';
 
 	export let data: ExerciseProgress[];
@@ -15,105 +15,107 @@
 
 	Chart.register(...registerables);
 
+	function shortDate(dateStr: string): string {
+		return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+	}
+
 	function createChart() {
-		if (chart) {
-			chart.destroy();
-		}
+		if (chart) chart.destroy();
 
-		const labels = data.map((d) => formatDate(d.date));
-		const weights = data.map((d) => convertWeight(d.best_weight, unit));
-		const volumes = data.map((d) => convertWeight(d.total_volume, unit));
+		const isDark = document.documentElement.classList.contains('dark');
+		const gridColor = isDark ? 'rgba(75,85,99,0.3)' : 'rgba(0,0,0,0.08)';
+		const tickColor = isDark ? '#9ca3af' : '#6b7280';
+		const labelColor = isDark ? '#d1d5db' : '#374151';
 
-		const config: ChartConfiguration = {
-			type: 'line',
+		chart = new Chart(canvas, {
+			type: 'bar',
 			data: {
-				labels,
+				labels: data.map(d => shortDate(d.date)),
 				datasets: [
 					{
-						label: `Best Weight (${unit})`,
-						data: weights,
-						borderColor: 'rgb(34, 197, 94)',
-						backgroundColor: 'rgba(34, 197, 94, 0.1)',
-						yAxisID: 'y',
-						tension: 0.3,
-						pointRadius: 4
+						type: 'bar',
+						label: `Volume (${unit})`,
+						data: data.map(d => convertWeight(d.total_volume, unit)),
+						backgroundColor: isDark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.18)',
+						borderColor: isDark ? 'rgba(59,130,246,0.5)' : 'rgba(59,130,246,0.4)',
+						borderWidth: 1,
+						yAxisID: 'y1',
+						order: 2
 					},
 					{
-						label: `Total Volume (${unit})`,
-						data: volumes,
-						borderColor: 'rgb(59, 130, 246)',
-						backgroundColor: 'rgba(59, 130, 246, 0.1)',
-						yAxisID: 'y1',
+						type: 'line',
+						label: `Best Weight (${unit})`,
+						data: data.map(d => convertWeight(d.best_weight, unit)),
+						borderColor: 'rgb(34,197,94)',
+						backgroundColor: 'rgba(34,197,94,0.0)',
 						tension: 0.3,
-						pointRadius: 4
+						pointRadius: 4,
+						pointHoverRadius: 6,
+						pointBackgroundColor: 'rgb(34,197,94)',
+						borderWidth: 2,
+						yAxisID: 'y',
+						order: 1
 					}
 				]
 			},
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
-				interaction: {
-					mode: 'index',
-					intersect: false
-				},
+				interaction: { mode: 'index', intersect: false },
 				plugins: {
 					legend: {
-						position: 'top'
+						position: 'top',
+						align: 'end',
+						labels: {
+							usePointStyle: true,
+							pointStyleWidth: 8,
+							padding: 12,
+							color: labelColor,
+							font: { size: 11 }
+						}
+					},
+					tooltip: {
+						callbacks: {
+							label: ctx => {
+								const v = Math.round(ctx.parsed.y ?? 0);
+								return `${ctx.dataset.label}: ${v.toLocaleString()}`;
+							}
+						}
 					}
 				},
 				scales: {
 					x: {
-						grid: {
-							display: false
-						}
+						grid: { display: false },
+						ticks: { color: tickColor, maxTicksLimit: 6, maxRotation: 0 }
 					},
 					y: {
-						type: 'linear',
-						display: true,
 						position: 'left',
-						title: {
-							display: true,
-							text: `Weight (${unit})`
-						}
+						beginAtZero: false,
+						grid: { color: gridColor },
+						ticks: { color: tickColor, maxTicksLimit: 5 },
+						title: { display: true, text: `Weight (${unit})`, color: labelColor, font: { size: 10 } }
 					},
 					y1: {
-						type: 'linear',
-						display: true,
 						position: 'right',
-						title: {
-							display: true,
-							text: `Volume (${unit})`
-						},
-						grid: {
-							drawOnChartArea: false
-						}
+						display: false,
+						grid: { drawOnChartArea: false }
 					}
 				}
 			}
-		};
-
-		chart = new Chart(canvas, config);
+		});
 	}
+
+	$: if (canvas && data.length > 0) createChart();
 
 	onMount(() => {
-		if (data.length > 0) {
-			createChart();
-		}
-		return () => {
-			if (chart) {
-				chart.destroy();
-			}
-		};
+		if (data.length > 0) createChart();
+		return () => { if (chart) chart.destroy(); };
 	});
-
-	$: if (canvas && data.length > 0) {
-		createChart();
-	}
 </script>
 
 <Card class="p-4 sm:p-6">
-	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">{title}</h3>
-	<div class="h-48 sm:h-64">
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">{title}</h3>
+	<div class="h-56 sm:h-72">
 		{#if data.length > 0}
 			<canvas bind:this={canvas}></canvas>
 		{:else}

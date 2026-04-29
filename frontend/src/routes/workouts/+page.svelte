@@ -6,14 +6,15 @@
 	import Card from '$lib/components/ui/Card.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
+	import WorkoutConsistencyCharts from '$lib/components/charts/WorkoutConsistencyCharts.svelte';
 	import { ChevronDown, ChevronUp, Dumbbell, Clock, Layers } from 'lucide-svelte';
 
 	let unit: Unit = 'lbs';
+	let allWorkouts: WorkoutSummary[] = [];
 	let workouts: WorkoutSummary[] = [];
 	let expandedWorkout: WorkoutWithSets | null = null;
 	let expandedId: number | null = null;
 	let loading = true;
-	let loadingMore = false;
 	let loadingDetails = false;
 	let error: string | null = null;
 	let skip = 0;
@@ -24,9 +25,11 @@
 		try {
 			loading = true;
 			error = null;
-			workouts = await getWorkouts(0, limit);
+			// Fetch all for charts, then page the list
+			allWorkouts = await getWorkouts(0, 1000);
+			workouts = allWorkouts.slice(0, limit);
 			skip = workouts.length;
-			hasMore = workouts.length === limit;
+			hasMore = allWorkouts.length > limit;
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to load workouts';
 		} finally {
@@ -34,19 +37,12 @@
 		}
 	}
 
-	async function loadMore() {
-		if (loadingMore || !hasMore) return;
-		try {
-			loadingMore = true;
-			const more = await getWorkouts(skip, limit);
-			workouts = [...workouts, ...more];
-			skip += more.length;
-			hasMore = more.length === limit;
-		} catch (e) {
-			console.error(e);
-		} finally {
-			loadingMore = false;
-		}
+	function loadMore() {
+		if (!hasMore) return;
+		const next = allWorkouts.slice(skip, skip + limit);
+		workouts = [...workouts, ...next];
+		skip += next.length;
+		hasMore = skip < allWorkouts.length;
 	}
 
 	async function toggleExpand(id: number) {
@@ -103,6 +99,10 @@
 			{error}
 		</div>
 	{:else}
+		{#if allWorkouts.length > 0}
+			<WorkoutConsistencyCharts workouts={allWorkouts} {unit} />
+		{/if}
+
 		<div class="space-y-3 sm:space-y-4">
 			{#each workouts as workout (workout.id)}
 				<Card class="overflow-hidden">
@@ -185,13 +185,7 @@
 
 		{#if hasMore}
 			<div class="flex justify-center pt-2 sm:pt-4">
-				<Button variant="secondary" on:click={loadMore} disabled={loadingMore}>
-					{#if loadingMore}
-						Loading...
-					{:else}
-						Load More
-					{/if}
-				</Button>
+				<Button variant="secondary" on:click={loadMore}>Load More</Button>
 			</div>
 		{/if}
 	{/if}

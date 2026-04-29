@@ -7,7 +7,7 @@ export function convertWeight(lbs: number, unit: Unit): number {
 	if (unit === 'kg') {
 		return Math.round(lbs * LBS_TO_KG * 10) / 10;
 	}
-	return lbs;
+	return Math.round(lbs);
 }
 
 export function convertDistance(miles: number, toKm: boolean): number {

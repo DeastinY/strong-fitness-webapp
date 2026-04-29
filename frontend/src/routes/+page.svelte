@@ -3,16 +3,11 @@
 	import type { KPIStats, VolumeDataPoint, CategoryVolume, WorkoutSummary, WorkoutWithSets, Unit } from '$lib/types';
 	import { getKPIStats, getVolumeStats, getCategoryStats, getWorkouts, getWorkout } from '$lib/api';
 	import { formatVolume, formatDuration } from '$lib/utils';
-	import { getContextualTip, type Tip } from '$lib/tips';
 	import KpiCard from '$lib/components/dashboard/KpiCard.svelte';
-	import TipCard from '$lib/components/dashboard/TipCard.svelte';
-	import WorkoutList from '$lib/components/dashboard/WorkoutList.svelte';
 	import VolumeChart from '$lib/components/charts/VolumeChart.svelte';
 	import MuscleGroupChart from '$lib/components/charts/MuscleGroupChart.svelte';
 	import WorkoutCalendar from '$lib/components/dashboard/WorkoutCalendar.svelte';
 	import ConsistencyScore from '$lib/components/dashboard/ConsistencyScore.svelte';
-	import OneRMTrends from '$lib/components/charts/OneRMTrends.svelte';
-	import NextWorkoutTip from '$lib/components/dashboard/NextWorkoutTip.svelte';
 	import LLMExport from '$lib/components/dashboard/LLMExport.svelte';
 	import UnitToggle from '$lib/components/ui/UnitToggle.svelte';
 	import { Activity, Flame, Dumbbell, Clock } from 'lucide-svelte';
@@ -21,10 +16,8 @@
 	let kpi: KPIStats | null = null;
 	let volumeData: VolumeDataPoint[] = [];
 	let categoryData: CategoryVolume[] = [];
-	let recentWorkouts: WorkoutSummary[] = [];
 	let allWorkouts: WorkoutSummary[] = [];
 	let workoutDetails: WorkoutWithSets[] = [];
-	let tip: Tip | null = null;
 	let loading = true;
 	let error: string | null = null;
 
@@ -32,28 +25,20 @@
 		try {
 			loading = true;
 			error = null;
-			const [kpiResult, volumeResult, categoryResult, workoutsResult, allWorkoutsResult] = await Promise.all([
+			const [kpiResult, volumeResult, categoryResult, allWorkoutsResult] = await Promise.all([
 				getKPIStats(),
 				getVolumeStats(),
 				getCategoryStats(),
-				getWorkouts(0, 5),
 				getWorkouts(0, 100)
 			]);
 			kpi = kpiResult;
 			volumeData = volumeResult;
 			categoryData = categoryResult;
-			recentWorkouts = workoutsResult;
 			allWorkouts = allWorkoutsResult;
 
-			// Fetch workout details for 1RM trends (last 15 workouts)
-			const detailsToFetch = allWorkoutsResult.slice(0, 15);
+			// Fetch workout details for muscle group progress (last 30 workouts for 2-month window)
+			const detailsToFetch = allWorkoutsResult.slice(0, 30);
 			workoutDetails = await Promise.all(detailsToFetch.map(w => getWorkout(w.id)));
-
-			// Get contextual tip based on user stats
-			tip = getContextualTip({
-				totalWorkouts: kpiResult.total_workouts,
-				streak: kpiResult.current_streak
-			});
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to load data';
 			console.error(e);
@@ -76,7 +61,7 @@
 		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
 		<div class="flex items-center gap-2 sm:gap-3">
 			{#if kpi}
-				<LLMExport {kpi} {volumeData} {categoryData} {recentWorkouts} />
+				<LLMExport {kpi} recentWorkouts={allWorkouts} />
 			{/if}
 			<UnitToggle bind:unit />
 		</div>
@@ -92,39 +77,11 @@
 			{error}
 		</div>
 	{:else if kpi}
-		<!-- Next Workout Recommendation -->
-		{#if workoutDetails.length > 0}
-			<NextWorkoutTip {workoutDetails} {categoryData} />
-		{/if}
-
 		<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-			<KpiCard
-				title="Workouts"
-				value={kpi.total_workouts}
-				icon={Activity}
-				color="blue"
-			/>
-			<KpiCard
-				title="Streak"
-				value={kpi.current_streak}
-				subtitle="weeks"
-				icon={Flame}
-				color="orange"
-			/>
-			<KpiCard
-				title="Volume"
-				value="{formatVolume(kpi.total_volume, unit)}"
-				subtitle={unit}
-				icon={Dumbbell}
-				color="green"
-			/>
-			<KpiCard
-				title="Duration"
-				value={formatDuration(kpi.avg_duration)}
-				subtitle="avg"
-				icon={Clock}
-				color="purple"
-			/>
+			<KpiCard title="Workouts" value={kpi.total_workouts} icon={Activity} color="blue" />
+			<KpiCard title="Streak" value={kpi.current_streak} subtitle="weeks" icon={Flame} color="orange" />
+			<KpiCard title="Volume" value="{formatVolume(kpi.total_volume, unit)}" subtitle={unit} icon={Dumbbell} color="green" />
+			<KpiCard title="Duration" value={formatDuration(kpi.avg_duration)} subtitle="avg" icon={Clock} color="purple" />
 		</div>
 
 		<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -138,16 +95,7 @@
 
 		<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 			<WorkoutCalendar workouts={allWorkouts} />
-			<MuscleGroupChart data={categoryData} {unit} title="Muscle Groups" />
+			<MuscleGroupChart data={categoryData} {unit} title="Muscle Groups" {workoutDetails} />
 		</div>
-
-		<OneRMTrends {workoutDetails} />
-
-		<!-- Tip of the Day -->
-		{#if tip}
-			<TipCard {tip} />
-		{/if}
-
-		<WorkoutList workouts={recentWorkouts} {unit} />
 	{/if}
 </div>
