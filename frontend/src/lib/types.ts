@@ -90,3 +90,60 @@ export interface UploadResult {
 }
 
 export type Unit = 'lbs' | 'kg';
+
+export interface ReportOverview {
+	total_workouts: number;
+	total_volume_lbs: number;
+	avg_duration_minutes: number;
+	avg_workouts_per_week: number;
+	total_sets: number;
+	unique_exercises: number;
+}
+
+export interface ReportMonthlyBreakdown {
+	label: string;
+	count: number;
+}
+
+export interface ReportDayOfWeek {
+	day: string;
+	count: number;
+}
+
+export interface ReportAttendance {
+	workout_dates: string[];
+	monthly_breakdown: ReportMonthlyBreakdown[];
+	day_of_week: ReportDayOfWeek[];
+}
+
+export interface ReportSet {
+	set_order: string;
+	weight_lbs: number | null;
+	reps: number | null;
+	distance: number | null;
+	seconds: number | null;
+	rpe: number | null;
+}
+
+export interface ReportSession {
+	date: string;
+	sets: ReportSet[];
+}
+
+export interface ReportExercise {
+	id: number;
+	name: string;
+	category: string | null;
+	progress: ExerciseProgress[];
+	sessions: ReportSession[];
+	pr: ExercisePR;
+}
+
+export interface ReportData {
+	generated_at: string;
+	date_from: string;
+	date_to: string;
+	overview: ReportOverview;
+	attendance: ReportAttendance;
+	exercises: ReportExercise[];
+}

@@ -5,7 +5,7 @@ import os
 
 from .database import engine, get_db, Base
 from .models import Workout, Exercise, Set
-from .routes import workouts, exercises, upload
+from .routes import workouts, exercises, upload, report
 from .services.analytics import (
     calculate_kpi_stats,
     get_volume_over_time,
@@ -31,6 +31,7 @@ app.add_middleware(
 app.include_router(workouts.router)
 app.include_router(exercises.router)
 app.include_router(upload.router)
+app.include_router(report.router)
 
 
 @app.on_event("startup")

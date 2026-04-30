@@ -9,7 +9,8 @@ import type {
 	Exercise,
 	ExerciseProgress,
 	ExercisePR,
-	UploadResult
+	UploadResult,
+	ReportData
 } from './types';
 import { get } from 'svelte/store';
 import { yearFilter } from './stores/yearFilter';
@@ -203,6 +204,14 @@ export async function getAllPRs(): Promise<ExercisePRSummary[]> {
 export async function getCardioStats(): Promise<CardioDataPoint[]> {
 	const data = await fetchApi<CardioDataPoint[]>('/stats/cardio');
 	return data.filter(d => isInYear(d.date));
+}
+
+export async function getAllVolumeStats(): Promise<VolumeDataPoint[]> {
+	return fetchApi<VolumeDataPoint[]>('/stats/volume');
+}
+
+export async function getReport(dateFrom: string, dateTo: string): Promise<ReportData> {
+	return fetchApi<ReportData>(`/report?date_from=${dateFrom}&date_to=${dateTo}`);
 }
 
 export async function uploadCSV(file: File): Promise<UploadResult> {

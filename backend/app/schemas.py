@@ -125,3 +125,68 @@ class UploadResult(BaseModel):
     sets_created: int
     exercises_created: int
     duplicates_skipped: int
+
+
+class ReportOverview(BaseModel):
+    total_workouts: int
+    total_volume_lbs: float
+    avg_duration_minutes: float
+    avg_workouts_per_week: float
+    total_sets: int
+    unique_exercises: int
+
+
+class ReportMonthlyBreakdown(BaseModel):
+    label: str
+    count: int
+
+
+class ReportDayOfWeek(BaseModel):
+    day: str
+    count: int
+
+
+class ReportAttendance(BaseModel):
+    workout_dates: list[str]
+    monthly_breakdown: list[ReportMonthlyBreakdown]
+    day_of_week: list[ReportDayOfWeek]
+
+
+class ReportSet(BaseModel):
+    set_order: str
+    weight_lbs: Optional[float]
+    reps: Optional[float]
+    distance: Optional[float]
+    seconds: Optional[float]
+    rpe: Optional[int]
+
+
+class ReportSession(BaseModel):
+    date: datetime
+    sets: list[ReportSet]
+
+
+class ReportExercise(BaseModel):
+    id: int
+    name: str
+    category: Optional[str]
+    progress: list[ExerciseProgress]
+    sessions: list[ReportSession]
+    pr: ExercisePR
+
+
+class ReportData(BaseModel):
+    generated_at: datetime
+    date_from: datetime
+    date_to: datetime
+    overview: ReportOverview
+    attendance: ReportAttendance
+    exercises: list[ReportExercise]
+
+
+# keep schemas importable for analytics
+__all__ = [
+    "ReportSet", "ReportSession", "ReportExercise",
+    "ReportOverview", "ReportAttendance", "ReportMonthlyBreakdown",
+    "ReportDayOfWeek", "ReportData",
+]

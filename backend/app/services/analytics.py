@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
+from collections import defaultdict
 from ..models import Workout, Exercise, Set
 from ..schemas import (
     KPIStats,
@@ -10,6 +11,14 @@ from ..schemas import (
     ExercisePRSummary,
     CategoryVolume,
     CardioDataPoint,
+    ReportData,
+    ReportOverview,
+    ReportAttendance,
+    ReportMonthlyBreakdown,
+    ReportDayOfWeek,
+    ReportSet,
+    ReportSession,
+    ReportExercise,
 )
 
 
@@ -265,3 +274,163 @@ def get_volume_by_category(db: Session) -> list[CategoryVolume]:
         CategoryVolume(category=r.category or "other", volume=round(r.volume, 2))
         for r in results
     ]
+
+
+def get_report_data(db: Session, date_from: datetime, date_to: datetime) -> ReportData:
+    workouts = (
+        db.query(Workout)
+        .filter(Workout.date >= date_from, Workout.date <= date_to)
+        .order_by(Workout.date)
+        .all()
+    )
+    workout_ids = [w.id for w in workouts]
+    workout_date_map = {w.id: w.date for w in workouts}
+
+    total_workouts = len(workouts)
+    avg_duration = 0.0
+    if total_workouts > 0:
+        avg_duration = sum(w.duration_minutes or 0 for w in workouts) / total_workouts
+
+    total_volume = 0.0
+    total_sets = 0
+    if workout_ids:
+        total_volume = (
+            db.query(func.sum(Set.weight_lbs * Set.reps))
+            .filter(Set.workout_id.in_(workout_ids), Set.weight_lbs.isnot(None), Set.reps.isnot(None))
+            .scalar() or 0.0
+        )
+        total_sets = (
+            db.query(func.count(Set.id))
+            .filter(Set.workout_id.in_(workout_ids))
+            .scalar() or 0
+        )
+
+    days = max(1, (date_to - date_from).days)
+    avg_per_week = total_workouts / (days / 7)
+
+    # Attendance
+    workout_dates = [w.date.strftime("%Y-%m-%d") for w in workouts]
+    days_abbr = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    monthly: dict[str, dict] = {}
+    dow_counts: dict[str, int] = {d: 0 for d in days_abbr}
+    for w in workouts:
+        key = w.date.strftime("%Y-%m")
+        if key not in monthly:
+            monthly[key] = {"label": w.date.strftime("%B %Y"), "count": 0}
+        monthly[key]["count"] += 1
+        dow_counts[days_abbr[w.date.weekday()]] += 1
+
+    monthly_breakdown = [
+        ReportMonthlyBreakdown(label=v["label"], count=v["count"])
+        for k, v in sorted(monthly.items())
+    ]
+    day_of_week = [ReportDayOfWeek(day=d, count=dow_counts[d]) for d in days_abbr]
+
+    # Single query for all set data — drives both chart progress and session detail
+    exercises: list[ReportExercise] = []
+    if workout_ids:
+        raw_sets = (
+            db.query(
+                Set.id,
+                Set.workout_id,
+                Set.exercise_id,
+                Set.set_order,
+                Set.weight_lbs,
+                Set.reps,
+                Set.distance,
+                Set.seconds,
+                Set.rpe,
+                Exercise.name.label("exercise_name"),
+                Exercise.category,
+            )
+            .join(Exercise, Exercise.id == Set.exercise_id)
+            .filter(Set.workout_id.in_(workout_ids), Exercise.category != "cardio")
+            .order_by(Exercise.name, Set.workout_id, Set.id)
+            .all()
+        )
+
+        exercise_data: dict[int, dict] = {}
+        for s in raw_sets:
+            if s.exercise_id not in exercise_data:
+                exercise_data[s.exercise_id] = {
+                    "name": s.exercise_name,
+                    "category": s.category,
+                    "workout_sets": defaultdict(list),
+                }
+            exercise_data[s.exercise_id]["workout_sets"][s.workout_id].append(s)
+
+        for ex_id, ex in sorted(exercise_data.items(), key=lambda x: x[1]["name"]):
+            sessions: list[ReportSession] = []
+            progress_list: list[ExerciseProgress] = []
+            bw_pr = bv_pr = breps_pr = b1rm_pr = 0.0
+
+            for wid, sets in sorted(ex["workout_sets"].items(), key=lambda x: workout_date_map[x[0]]):
+                date = workout_date_map[wid]
+
+                sessions.append(ReportSession(
+                    date=date,
+                    sets=[
+                        ReportSet(
+                            set_order=s.set_order or "?",
+                            weight_lbs=s.weight_lbs,
+                            reps=s.reps,
+                            distance=s.distance,
+                            seconds=s.seconds,
+                            rpe=s.rpe,
+                        )
+                        for s in sets
+                    ],
+                ))
+
+                strength = [s for s in sets if s.weight_lbs is not None and s.reps is not None]
+                if strength:
+                    bw = max(s.weight_lbs for s in strength)
+                    bv = max(s.weight_lbs * s.reps for s in strength)
+                    tv = sum(s.weight_lbs * s.reps for s in strength)
+                    rpes = [s.rpe for s in strength if s.rpe is not None]
+                    progress_list.append(ExerciseProgress(
+                        date=date,
+                        best_weight=round(bw, 2),
+                        best_volume=round(bv, 2),
+                        total_volume=round(tv, 2),
+                        avg_rpe=round(sum(rpes) / len(rpes), 1) if rpes else None,
+                    ))
+                    bw_pr = max(bw_pr, bw)
+                    bv_pr = max(bv_pr, bv)
+                    for s in strength:
+                        breps_pr = max(breps_pr, s.reps)
+                        b1rm_pr = max(b1rm_pr, s.weight_lbs * (1 + s.reps / 30))
+
+            exercises.append(ReportExercise(
+                id=ex_id,
+                name=ex["name"],
+                category=ex["category"],
+                progress=progress_list,
+                sessions=sessions,
+                pr=ExercisePR(
+                    best_weight=round(bw_pr, 2),
+                    best_volume=round(bv_pr, 2),
+                    best_reps=round(breps_pr, 2),
+                    best_estimated_1rm=round(b1rm_pr, 2),
+                ),
+            ))
+
+    return ReportData(
+        generated_at=datetime.now(),
+        date_from=date_from,
+        date_to=date_to,
+        overview=ReportOverview(
+            total_workouts=total_workouts,
+            total_volume_lbs=round(total_volume, 2),
+            avg_duration_minutes=round(avg_duration, 1),
+            avg_workouts_per_week=round(avg_per_week, 1),
+            total_sets=total_sets,
+            unique_exercises=len(exercises),
+        ),
+        attendance=ReportAttendance(
+            workout_dates=workout_dates,
+            monthly_breakdown=monthly_breakdown,
+            day_of_week=day_of_week,
+        ),
+        exercises=exercises,
+    )
