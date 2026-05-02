@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fitness Tracker — Personal Workout Dashboard</title>
+  <meta name="description" content="A self-hosted personal workout dashboard. Visualise gym progress, track PRs, and generate printable trainer reports from your own data." />
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --border: #2a2d3a;
+      --text: #e8eaf0;
+      --muted: #8b90a0;
+      --accent: #3b82f6;
+      --accent-soft: rgba(59,130,246,.15);
+      --green: #22c55e;
+      --radius: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── nav ── */
+    nav {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+    }
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .wordmark {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      color: var(--text);
+    }
+    .wordmark span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav ul a { color: var(--muted); font-size: .9rem; }
+    nav ul a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── hero ── */
+    .hero {
+      text-align: center;
+      padding: 96px 0 72px;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(59,130,246,.3);
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: .4px;
+      padding: 4px 14px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -.5px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+    }
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 24px;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:hover { opacity: .88; transform: translateY(-1px); text-decoration: none; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    /* ── install ── */
+    .install-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      max-width: 640px;
+      margin: 48px auto 0;
+      text-align: left;
+    }
+    .install-block p {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      font-weight: 600;
+    }
+    .install-block code {
+      display: block;
+      font-family: "SF Mono", "Fira Mono", monospace;
+      font-size: .82rem;
+      color: var(--green);
+      line-height: 2;
+      white-space: pre;
+    }
+    .install-block code .dim { color: var(--muted); }
+
+    /* ── features ── */
+    section.features { padding: 80px 0; }
+    .section-label {
+      text-align: center;
+      font-size: .8rem;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    section h2 {
+      text-align: center;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -.3px;
+      margin-bottom: 48px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: rgba(59,130,246,.4); }
+    .icon {
+      font-size: 1.6rem;
+      margin-bottom: 14px;
+    }
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .card p { font-size: .88rem; color: var(--muted); line-height: 1.55; }
+
+    /* ── report highlight ── */
+    .highlight {
+      background: linear-gradient(135deg, rgba(59,130,246,.08) 0%, rgba(34,197,94,.05) 100%);
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: var(--radius);
+      padding: 48px;
+      margin: 0 0 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    @media (max-width: 640px) {
+      .highlight { grid-template-columns: 1fr; padding: 32px 24px; }
+    }
+    .highlight h2 {
+      text-align: left;
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+      margin-bottom: 14px;
+    }
+    .highlight p { color: var(--muted); font-size: .92rem; margin-bottom: 20px; }
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .check-list li { font-size: .9rem; color: var(--muted); display: flex; align-items: flex-start; gap: 8px; }
+    .check-list li::before { content: "✓"; color: var(--green); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .report-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .preview-row { display: flex; gap: 10px; }
+    .preview-stat {
+      flex: 1;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+    .preview-stat .val { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
+    .preview-stat .lbl { font-size: .68rem; color: var(--muted); margin-top: 2px; }
+    .preview-bar-row { display: flex; flex-direction: column; gap: 6px; }
+    .preview-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--accent) var(--w), var(--border) var(--w));
+    }
+    .preview-bar-label { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); }
+
+    /* ── stack ── */
+    .stack-section { padding: 0 0 80px; }
+    .stack-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+    }
+    .tag {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: .85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <span class="wordmark">Fitness<span>Tracker</span></span>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#install">Install</a></li>
+      <li><a href="https://github.com/DeastinY/strong-fitness-webapp">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero container">
+  <div class="badge">Self-hosted · Open source</div>
+  <h1>Your gym data,<br /><em>actually useful</em></h1>
+  <p>A personal workout dashboard that turns CSV exports from your fitness app into progress charts, PR records, and printable trainer reports.</p>
+  <div class="cta-row">
+    <a href="https://github.com/DeastinY/strong-fitness-webapp" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+    <a href="#install" class="btn btn-ghost">Quick install ↓</a>
+  </div>
+
+  <div class="install-block" id="install">
+    <p>Quick install · no build needed</p>
+    <code><span class="dim"># 1. grab the compose file</span>
+curl -O https://raw.githubusercontent.com/DeastinY/strong-fitness-webapp/main/docker-compose.ghcr.yml
+
+<span class="dim"># 2. drop in your workout CSV</span>
+cp your-export.csv data.csv
+
+<span class="dim"># 3. run</span>
+docker compose -f docker-compose.ghcr.yml up -d</code>
+  </div>
+</section>
+
+<!-- ── Features ── -->
+<section class="features container" id="features">
+  <div class="section-label">Features</div>
+  <h2>Everything in one place</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="icon">📈</div>
+      <h3>Progress charts</h3>
+      <p>Volume trend, muscle group breakdown, and monthly load — filtered by year or viewed all time.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏆</div>
+      <h3>Personal records</h3>
+      <p>All-time PR table with best weight, estimated 1RM, and the date each record was set. Sortable and searchable.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📅</div>
+      <h3>Consistency heatmap</h3>
+      <p>Workout calendar and 12-week heatmap to see streaks and training frequency at a glance.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🏃</div>
+      <h3>Cardio tracking</h3>
+      <p>Distance and duration per session plotted alongside strength volume for a complete training picture.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔍</div>
+      <h3>Per-exercise detail</h3>
+      <p>Drill into any exercise for a full history: best weight, estimated 1RM trend, and session-by-session volume.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📤</div>
+      <h3>AI export</h3>
+      <p>One-click compact 3-month log you can paste straight into an LLM to get programming feedback.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Report highlight ── -->
+<section class="container">
+  <div class="highlight">
+    <div>
+      <h2>Printable trainer reports</h2>
+      <p>Generate a PDF-ready progress report for any date range and hand it to your coach before the next session.</p>
+      <ul class="check-list">
+        <li>Overview: sessions, volume, avg duration, frequency</li>
+        <li>Attendance calendar across all selected months</li>
+        <li>All-time monthly load chart with selected range highlighted</li>
+        <li>Per-exercise: progress chart, set-by-set table with weight deltas</li>
+        <li>Print via browser — no extra tools needed</li>
+      </ul>
+    </div>
+    <div class="report-preview">
+      <div class="preview-row">
+        <div class="preview-stat"><div class="val">48</div><div class="lbl">Sessions</div></div>
+        <div class="preview-stat"><div class="val">4.1×</div><div class="lbl">Per week</div></div>
+        <div class="preview-stat"><div class="val">62 min</div><div class="lbl">Avg duration</div></div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:14px;">
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:10px;font-weight:600;text-transform:uppercase;letter-spacing:.4px">Sessions per month</div>
+        <div class="preview-bar-row">
+          <div class="preview-bar-label"><span>Feb</span><span>14</span></div>
+          <div class="preview-bar" style="--w:75%"></div>
+          <div class="preview-bar-label"><span>Mar</span><span>18</span></div>
+          <div class="preview-bar" style="--w:95%"></div>
+          <div class="preview-bar-label"><span>Apr</span><span>16</span></div>
+          <div class="preview-bar" style="--w:84%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Stack ── -->
+<section class="stack-section container">
+  <div class="section-label">Built with</div>
+  <div style="height:16px"></div>
+  <div class="stack-grid">
+    <span class="tag">SvelteKit</span>
+    <span class="tag">Tailwind CSS</span>
+    <span class="tag">Chart.js</span>
+    <span class="tag">FastAPI</span>
+    <span class="tag">SQLite</span>
+    <span class="tag">Docker</span>
+    <span class="tag">TrueNAS catalog</span>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <p>Open source · <a href="https://github.com/DeastinY/strong-fitness-webapp">github.com/DeastinY/strong-fitness-webapp</a></p>
+</footer>
+
+</body>
+</html>
