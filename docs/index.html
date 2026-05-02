@@ -166,6 +166,27 @@
     .install-note { padding: 12px 20px; font-size: .8rem; color: var(--muted); border-top: 1px solid var(--border); }
     .install-note a { color: var(--muted); text-decoration: underline; }
 
+    /* ── comparison ── */
+    .comparison { padding: 0 0 88px; }
+    .comparison h2 { text-align: center; font-size: clamp(1.6rem,3vw,2.2rem); font-weight: 800; letter-spacing: -.3px; margin-bottom: 10px; }
+    .comparison .sub { text-align: center; color: var(--muted); font-size: .95rem; margin-bottom: 36px; }
+    .cmp-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table.cmp {
+      width: 100%; border-collapse: collapse;
+      font-size: .88rem; min-width: 520px;
+    }
+    table.cmp th, table.cmp td { padding: 11px 16px; text-align: center; border-bottom: 1px solid var(--border); }
+    table.cmp th { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    table.cmp td:first-child, table.cmp th:first-child { text-align: left; }
+    table.cmp tr:last-child td { border-bottom: none; }
+    table.cmp .col-us { background: rgba(59,130,246,.05); }
+    table.cmp th.col-us { color: var(--accent); }
+    .yes { color: var(--green); font-weight: 700; }
+    .no { color: #3a3f52; font-weight: 600; }
+    .part { color: var(--muted); font-weight: 600; }
+    .row-label { font-weight: 500; color: var(--text); }
+    .row-label small { display: block; font-size: .76rem; color: var(--muted); font-weight: 400; }
+
     /* ── footer ── */
     footer { border-top: 1px solid var(--border); padding: 32px 0; text-align: center; font-size: .82rem; color: var(--muted); }
     footer a { color: var(--muted); }
@@ -333,6 +354,80 @@
       <img src="screenshots/report.png" alt="Trainer report overview" />
     </div>
   </div>
+</section>
+
+<!-- ── Comparison ── -->
+<section class="comparison container">
+  <div class="section-label">Alternatives</div>
+  <h2>How it compares</h2>
+  <p class="sub">Other open-source options exist — here's how they stack up for gym analytics.</p>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="col-us">This app</th>
+          <th><a href="https://github.com/wger-project/wger" style="color:var(--muted)">wger</a></th>
+          <th><a href="https://github.com/Snouzy/workout-cool" style="color:var(--muted)">workout.cool</a></th>
+          <th><a href="https://github.com/LiamMorrow/LiftLog" style="color:var(--muted)">LiftLog</a></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Self-hosted <small>Docker, no cloud dependency</small></td>
+          <td class="col-us yes">✓</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+          <td class="part">~</td>
+        </tr>
+        <tr>
+          <td class="row-label">CSV import <small>Strong, Hevy or compatible format</small></td>
+          <td class="col-us yes">✓</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+        </tr>
+        <tr>
+          <td class="row-label">Analytics dashboard <small>Charts, trends, volume over time</small></td>
+          <td class="col-us yes">✓</td>
+          <td class="part">~</td>
+          <td class="no">✗</td>
+          <td class="part">~</td>
+        </tr>
+        <tr>
+          <td class="row-label">PR tracking <small>Best weight, estimated 1RM</small></td>
+          <td class="col-us yes">✓</td>
+          <td class="yes">✓</td>
+          <td class="no">✗</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Trainer report <small>Printable PDF, per-exercise detail</small></td>
+          <td class="col-us yes">✓</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+        </tr>
+        <tr>
+          <td class="row-label">Workout planning <small>Routines, exercise library</small></td>
+          <td class="col-us no">✗</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+          <td class="yes">✓</td>
+        </tr>
+        <tr>
+          <td class="row-label">Nutrition tracking</td>
+          <td class="col-us no">✗</td>
+          <td class="yes">✓</td>
+          <td class="no">✗</td>
+          <td class="no">✗</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:16px;font-size:.78rem;color:var(--muted);text-align:center">
+    This app is built for people who already track workouts in Strong or a compatible app and want a self-hosted analytics layer on top of their data.
+  </p>
 </section>
 
 <!-- ── Footer ── -->
