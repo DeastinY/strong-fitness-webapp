@@ -1,0 +1,11 @@
+images:
+  backend_image:
+    repository: ghcr.io/deastiny/strong-fitness-webapp-backend
+    tag: edb8955
+  frontend_image:
+    repository: ghcr.io/deastiny/strong-fitness-webapp-frontend
+    tag: edb8955
+
+consts:
+  backend_container_name: fitness-backend
+  frontend_container_name: fitness-frontend

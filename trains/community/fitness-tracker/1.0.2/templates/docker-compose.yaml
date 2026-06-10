@@ -1,0 +1,29 @@
+{% set tpl = ix_lib.base.render.Render(values) %}
+
+{# ── Backend ─────────────────────────────────────────────────────────────── #}
+{% set backend = tpl.add_container(values.consts.backend_container_name, "backend_image") %}
+
+{% do backend.healthcheck.set_custom_test(["CMD", "python", "-c",
+    "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]) %}
+
+{% do backend.environment.add_env("DATABASE_URL", "sqlite:////app/data/fitness.db") %}
+{% do backend.environment.add_env("SEED_CSV_PATH", "/app/seed/data.csv") %}
+
+{% do backend.add_storage("/app/data", values.storage.data) %}
+
+{% do backend.environment.add_user_envs(values.fitness.additional_envs) %}
+
+{# ── Frontend ────────────────────────────────────────────────────────────── #}
+{% set frontend = tpl.add_container(values.consts.frontend_container_name, "frontend_image") %}
+
+{% do frontend.depends.add_dependency(values.consts.backend_container_name, "service_healthy") %}
+
+{% do frontend.environment.add_env("ORIGIN", values.fitness.origin) %}
+{% do frontend.environment.add_env("API_BACKEND",
+    "http://%s:8000" | format(values.consts.backend_container_name)) %}
+
+{% do frontend.add_port(values.network.web_port) %}
+
+{% do tpl.portals.add(values.network.web_port) %}
+
+{{ tpl.render() | tojson }}
