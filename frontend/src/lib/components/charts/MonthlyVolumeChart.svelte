@@ -51,9 +51,9 @@
 			type: 'line',
 			data: {
 				labels,
-				datasets: [
+					datasets: [
 					{
-						label: `Volume (${u})`,
+						label: `Load arc (${u})`,
 						data: volumes,
 						borderColor: inRange.map(r => r ? 'rgb(59,130,246)' : 'rgba(59,130,246,0.3)'),
 						backgroundColor: 'rgba(59,130,246,0.08)',
@@ -74,7 +74,7 @@
 						order: 2,
 					},
 					{
-						label: 'Sessions',
+						label: 'Session count',
 						data: counts,
 						borderColor: inRange.map(r => r ? 'rgb(34,197,94)' : 'rgba(34,197,94,0.3)'),
 						backgroundColor: 'rgba(34,197,94,0)',
@@ -116,8 +116,8 @@
 						callbacks: {
 							label: (ctx) => {
 								if (ctx.datasetIndex === 0)
-									return `Volume: ${Math.round(ctx.parsed.y ?? 0).toLocaleString()} ${u}`;
-								return `Sessions: ${ctx.parsed.y}`;
+									return `Load arc: ${Math.round(ctx.parsed.y ?? 0).toLocaleString()} ${u}`;
+								return `Session count: ${ctx.parsed.y}`;
 							},
 						},
 					},
@@ -135,14 +135,14 @@
 							color: tickColor,
 							callback: (v) => (typeof v === 'number' ? v.toLocaleString() : v),
 						},
-						title: { display: true, text: `Volume (${u})`, color: labelColor, font: { size: 10 } },
+						title: { display: true, text: `Load arc (${u})`, color: labelColor, font: { size: 10 } },
 					},
 					y1: {
 						position: 'right',
 						beginAtZero: true,
 						grid: { drawOnChartArea: false },
 						ticks: { color: 'rgb(34,197,94)', stepSize: 1 },
-						title: { display: true, text: 'Sessions', color: 'rgb(34,197,94)', font: { size: 10 } },
+						title: { display: true, text: 'Session count', color: 'rgb(34,197,94)', font: { size: 10 } },
 					},
 				},
 			},
@@ -159,14 +159,14 @@
 
 <Card class="p-4 sm:p-6">
 	<div class="flex items-center justify-between mb-3">
-		<h3 class="text-base font-semibold text-gray-900 dark:text-white">Monthly Load — All Time</h3>
+		<h3 class="text-base font-semibold text-gray-900 dark:text-white">All-Time Monthly Arc</h3>
 		{#if highlightFrom && highlightTo}
 			<div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
 				<span class="flex items-center gap-1.5">
-					<span class="w-3 h-0.5 inline-block bg-blue-500 rounded"></span> Selected
+					<span class="w-3 h-0.5 inline-block bg-blue-500 rounded"></span> Focus window
 				</span>
 				<span class="flex items-center gap-1.5">
-					<span class="w-3 h-0.5 inline-block bg-blue-300 rounded"></span> Other
+					<span class="w-3 h-0.5 inline-block bg-blue-300 rounded"></span> Offstage months
 				</span>
 			</div>
 		{/if}
@@ -176,7 +176,7 @@
 			<canvas bind:this={canvas}></canvas>
 		{:else}
 			<div class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-				No data
+				No monthly load arc yet
 			</div>
 		{/if}
 	</div>

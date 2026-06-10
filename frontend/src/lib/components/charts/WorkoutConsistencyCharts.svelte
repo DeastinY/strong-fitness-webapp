@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { Chart, registerables } from 'chart.js';
 	import type { WorkoutSummary, Unit } from '$lib/types';
-	import { convertWeight } from '$lib/utils';
 	import Card from '../ui/Card.svelte';
 
 	export let workouts: WorkoutSummary[];
@@ -94,8 +93,8 @@
 			type: 'bar',
 			data: {
 				labels: weekly.map(w => w.label),
-				datasets: [{
-					label: 'Sessions',
+					datasets: [{
+					label: 'Weekly sessions',
 					data: weekly.map(w => w.count),
 					backgroundColor: weekly.map(w => freqBarColor(w.count)),
 					borderRadius: 4,
@@ -107,7 +106,7 @@
 				maintainAspectRatio: false,
 				plugins: {
 					legend: { display: false },
-					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} session${ctx.parsed.y !== 1 ? 's' : ''}` } }
+					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} session${ctx.parsed.y !== 1 ? 's' : ''} in this week` } }
 				},
 				scales: {
 					x: {
@@ -132,8 +131,8 @@
 			type: 'bar',
 			data: {
 				labels: DOW_LABELS,
-				datasets: [{
-					label: 'Workouts',
+					datasets: [{
+					label: 'Sessions by weekday',
 					data: dowCounts,
 					backgroundColor: dowCounts.map(n => {
 						const alpha = 0.2 + 0.7 * (n / maxDow);
@@ -148,7 +147,7 @@
 				maintainAspectRatio: false,
 				plugins: {
 					legend: { display: false },
-					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} workouts` } }
+					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} session${ctx.parsed.y !== 1 ? 's' : ''} on this day` } }
 				},
 				scales: {
 					x: {
@@ -171,8 +170,8 @@
 			type: 'line',
 			data: {
 				labels: durationData.map(d => d.label),
-				datasets: [{
-					label: 'Duration (min)',
+					datasets: [{
+					label: 'Session runtime (min)',
 					data: durationData.map(d => d.duration),
 					borderColor: 'rgb(168,85,247)',
 					backgroundColor: 'rgba(168,85,247,0.08)',
@@ -188,7 +187,7 @@
 				maintainAspectRatio: false,
 				plugins: {
 					legend: { display: false },
-					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min` } }
+					tooltip: { callbacks: { label: ctx => `${ctx.parsed.y} min runtime` } }
 				},
 				scales: {
 					x: {
@@ -221,8 +220,8 @@
 	<div class="grid grid-cols-1 sm:grid-cols-5 gap-4">
 		<!-- Weekly frequency -->
 		<Card class="p-4 sm:col-span-3">
-			<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Weekly Frequency</h3>
-			<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Sessions per week — last 16 weeks</p>
+			<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Weekly Rhythm</h3>
+			<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Sessions per week across the last 16 scenes, tracked in {unit}</p>
 			<div class="h-36 sm:h-44">
 				<canvas bind:this={freqCanvas}></canvas>
 			</div>
@@ -236,8 +235,8 @@
 
 		<!-- Day of week -->
 		<Card class="p-4 sm:col-span-2">
-			<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Day of Week</h3>
-			<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Total sessions per weekday</p>
+			<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Weekday Bias</h3>
+			<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Where your sessions usually land</p>
 			<div class="h-36 sm:h-44">
 				<canvas bind:this={dowCanvas}></canvas>
 			</div>
@@ -246,8 +245,8 @@
 
 	<!-- Duration over time -->
 	<Card class="p-4">
-		<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Session Duration</h3>
-		<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Minutes per session over time</p>
+		<h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Session Runtime Arc</h3>
+		<p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Minutes per session over your timeline</p>
 		<div class="h-36 sm:h-44">
 			<canvas bind:this={durationCanvas}></canvas>
 		</div>

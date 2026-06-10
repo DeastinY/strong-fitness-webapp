@@ -86,12 +86,12 @@
 </script>
 
 <svelte:head>
-	<title>Workouts - Fitness Tracker</title>
+	<title>Session Log - Strong Stage</title>
 </svelte:head>
 
-<div class="space-y-4 sm:space-y-6">
+<div class="stage-stack space-y-4 sm:space-y-6">
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Workouts</h1>
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Session Chronicle</h1>
 		<div class="flex items-center gap-2 sm:gap-3">
 			<YearFilter />
 			<UnitToggle bind:unit />
@@ -101,7 +101,7 @@
 	{#if loading}
 		<div class="flex flex-col items-center justify-center h-64 gap-3">
 			<div class="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
-			<p class="text-sm text-gray-500 dark:text-gray-400">Loading workouts...</p>
+			<p class="text-sm text-gray-500 dark:text-gray-400">Rolling the archive onstage...</p>
 		</div>
 	{:else if error}
 		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-red-700 dark:text-red-400">
@@ -197,7 +197,7 @@
 
 		{#if hasMore}
 			<div class="flex justify-center pt-2 sm:pt-4">
-				<Button variant="secondary" on:click={loadMore}>Load More</Button>
+				<Button variant="secondary" on:click={loadMore}>Reveal More Sessions</Button>
 			</div>
 		{/if}
 	{/if}

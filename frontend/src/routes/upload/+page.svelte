@@ -69,21 +69,21 @@
 </script>
 
 <svelte:head>
-	<title>Upload - Fitness Tracker</title>
+	<title>Data Ingest - Strong Stage</title>
 </svelte:head>
 
-<div class="space-y-4 sm:space-y-6">
-	<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Upload</h1>
+<div class="stage-stack space-y-4 sm:space-y-6">
+	<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Data Ingest Portal</h1>
 
 	{#if result}
 		<Card class="p-6">
 			<div class="text-center">
 				<CheckCircle class="w-12 h-12 mx-auto mb-4 text-green-500" />
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upload Complete</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Import Complete</h2>
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
 					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.workouts_created}</p>
-						<p class="text-sm text-gray-500 dark:text-gray-400">Workouts Created</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Sessions Created</p>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.sets_created}</p>
@@ -91,7 +91,7 @@
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.exercises_created}</p>
-						<p class="text-sm text-gray-500 dark:text-gray-400">Exercises Created</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Lifts Created</p>
 					</div>
 					<div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
 						<p class="text-2xl font-bold text-gray-900 dark:text-white">{result.duplicates_skipped}</p>
@@ -99,8 +99,8 @@
 					</div>
 				</div>
 				<div class="flex justify-center gap-4">
-					<Button variant="secondary" on:click={reset}>Upload Another</Button>
-					<Button on:click={() => window.location.href = '/'}>View Dashboard</Button>
+					<Button variant="secondary" on:click={reset}>Ingest Another File</Button>
+					<Button on:click={() => window.location.href = '/'}>Open Command Deck</Button>
 				</div>
 			</div>
 		</Card>
@@ -124,7 +124,7 @@
 				{:else}
 					<Upload class="w-12 h-12 mx-auto mb-4 text-gray-400" />
 					<p class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-						Drag and drop your CSV file here
+						Drag your Strong CSV onto the stage
 					</p>
 					<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">or</p>
 					<label>
@@ -137,7 +137,7 @@
 						<span
 							class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
 						>
-							Browse Files
+							Choose File
 						</span>
 					</label>
 				{/if}
@@ -146,7 +146,7 @@
 
 		{#if preview.length > 0}
 			<Card class="p-6">
-				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview</h2>
+				<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Preview Reel</h2>
 				<div class="overflow-x-auto">
 					<pre class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">{preview.join('\n')}</pre>
 				</div>
@@ -166,10 +166,10 @@
 				<Button on:click={handleUpload} disabled={uploading}>
 					{#if uploading}
 						<span class="animate-spin mr-2">⏳</span>
-						Uploading...
+						Ingesting...
 					{:else}
 						<Upload class="w-4 h-4 mr-2" />
-						Upload CSV
+						Ingest CSV
 					{/if}
 				</Button>
 			</div>

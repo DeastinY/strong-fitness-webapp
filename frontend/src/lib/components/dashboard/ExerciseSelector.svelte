@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Exercise } from '$lib/types';
-	import { getCategoryColor } from '$lib/utils';
 
 	export let exercises: Exercise[];
 	export let selectedId: number | null = null;
@@ -9,9 +8,9 @@
 <div class="relative">
 	<select
 		bind:value={selectedId}
-		class="block w-full px-4 py-2 pr-8 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none cursor-pointer"
+		class="block w-full px-4 py-2 pr-8 text-gray-900 dark:text-white bg-white/90 dark:bg-[#2a211b] border border-amber-900/20 dark:border-amber-100/20 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none cursor-pointer"
 	>
-		<option value={null}>Select an exercise</option>
+		<option value={null}>Select a featured lift</option>
 		{#each exercises as exercise}
 			<option value={exercise.id}>
 				{exercise.name}

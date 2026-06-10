@@ -3,6 +3,6 @@
 	export { className as class };
 </script>
 
-<div class="bg-white dark:bg-gray-800/50 rounded-2xl shadow-sm shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-gray-700/50 backdrop-blur-sm transition-all duration-200 hover:shadow-md hover:shadow-gray-200/50 dark:hover:shadow-none {className}">
+<div class="bg-white/85 dark:bg-[#231b15]/72 rounded-2xl shadow-lg shadow-amber-900/10 dark:shadow-orange-950/20 border border-amber-900/10 dark:border-amber-100/10 backdrop-blur-sm transition-all duration-200 hover:shadow-xl hover:shadow-amber-900/15 dark:hover:shadow-orange-950/30 {className}">
 	<slot />
 </div>

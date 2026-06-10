@@ -7,7 +7,7 @@
 
 	export let data: CategoryVolume[];
 	export let unit: Unit;
-	export let title = 'Volume by Muscle Group';
+	export let title = 'Muscle Cast Split';
 	export let workoutDetails: WorkoutWithSets[] = [];
 
 	interface MuscleGroup {
@@ -109,14 +109,14 @@
 		</div>
 
 		<div class="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
-			<span class="text-xs text-gray-400 dark:text-gray-500">Trend: past month vs prior</span>
+			<span class="text-xs text-gray-400 dark:text-gray-500">Momentum: last 30 days vs the 30 before</span>
 			<span class="text-sm font-bold text-gray-900 dark:text-white">
 				{convertWeight(totalVolume, unit).toLocaleString()} {unit}
 			</span>
 		</div>
 	{:else}
 		<div class="h-48 flex items-center justify-center text-gray-500 dark:text-gray-400">
-			No data available
+			No muscle cast data yet
 		</div>
 	{/if}
 </Card>
