@@ -1,0 +1,11 @@
+images:
+  backend_image:
+    repository: ghcr.io/deastiny/strong-fitness-webapp-backend
+    tag: 23e794e
+  frontend_image:
+    repository: ghcr.io/deastiny/strong-fitness-webapp-frontend
+    tag: 23e794e
+
+consts:
+  backend_container_name: fitness-backend
+  frontend_container_name: fitness-frontend
