@@ -79,7 +79,7 @@
 		const end = now.toLocaleDateString('en-US', dateOpts);
 
 		const header = [
-			`PERFORMANCE LOGBOOK — last 3 months`,
+			`TRAINING LOG — last 3 months`,
 			`${start} to ${end} | ${workouts.length} sessions | avg ${Math.round(kpi.avg_duration)} min | streak: ${kpi.current_streak} weeks`,
 			`31yo male, mostly sedentary, returned to training Jan 2026`,
 			``,
@@ -125,7 +125,7 @@
 
 <Button variant="secondary" on:click={handleExport} disabled={loading} class="gap-1.5 sm:gap-2">
 	<MessageSquare class="w-4 h-4" />
-	<span class="hidden sm:inline">{loading ? 'Building...' : 'Generate AI Script'}</span>
+	<span class="hidden sm:inline">{loading ? 'Loading...' : 'Export for AI'}</span>
 	<span class="sm:hidden">{loading ? '...' : 'AI'}</span>
 </Button>
 
@@ -144,7 +144,7 @@
 		role="document"
 	>
 		<div class="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-700/50">
-			<h2 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">AI-Ready Performance Script</h2>
+			<h2 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">AI-Ready Summary</h2>
 			<button
 				class="p-2 -mr-2 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
 				on:click={closeModal}
@@ -160,7 +160,7 @@
 		</div>
 
 		<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 border-t border-gray-100 dark:border-gray-700/50 bg-gray-50 dark:bg-gray-900/50 rounded-b-2xl">
-			<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">Paste into ChatGPT, Claude, or your coach bot.</p>
+			<p class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">Paste into ChatGPT, Claude, etc.</p>
 			<Button on:click={copyToClipboard} class="gap-2 w-full sm:w-auto justify-center">
 				{#if copied}
 					<Check class="w-4 h-4" />

@@ -8,7 +8,7 @@
 
 	export let data: ExerciseProgress[];
 	export let unit: Unit;
-	export let title = 'Exercise Progress Arc';
+	export let title = 'Exercise Progress';
 
 	let canvas: HTMLCanvasElement;
 	let chart: Chart | null = null;
@@ -31,10 +31,10 @@
 			type: 'bar',
 			data: {
 				labels: data.map(d => shortDate(d.date)),
-					datasets: [
+				datasets: [
 					{
 						type: 'bar',
-						label: `Session volume (${unit})`,
+						label: `Volume (${unit})`,
 						data: data.map(d => convertWeight(d.total_volume, unit)),
 						backgroundColor: isDark ? 'rgba(59,130,246,0.25)' : 'rgba(59,130,246,0.18)',
 						borderColor: isDark ? 'rgba(59,130,246,0.5)' : 'rgba(59,130,246,0.4)',
@@ -44,7 +44,7 @@
 					},
 					{
 						type: 'line',
-						label: `Top set load (${unit})`,
+						label: `Best Weight (${unit})`,
 						data: data.map(d => convertWeight(d.best_weight, unit)),
 						borderColor: 'rgb(34,197,94)',
 						backgroundColor: 'rgba(34,197,94,0.0)',
@@ -84,7 +84,7 @@
 								const idx = ctx[0]?.dataIndex;
 								if (idx == null) return [];
 								const rpe = data[idx]?.avg_rpe;
-								return rpe != null ? [`Intensity cue (RPE): ${rpe}`] : [];
+								return rpe != null ? [`Avg RPE: ${rpe}`] : [];
 							}
 						}
 					}
@@ -99,7 +99,7 @@
 						beginAtZero: false,
 						grid: { color: gridColor },
 						ticks: { color: tickColor, maxTicksLimit: 5 },
-						title: { display: true, text: `Load (${unit})`, color: labelColor, font: { size: 10 } }
+						title: { display: true, text: `Weight (${unit})`, color: labelColor, font: { size: 10 } }
 					},
 					y1: {
 						position: 'right',
@@ -126,7 +126,7 @@
 			<canvas bind:this={canvas}></canvas>
 		{:else}
 			<div class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-				Select a lift to reveal its progress arc
+				Select an exercise to view progress
 			</div>
 		{/if}
 	</div>
@@ -136,9 +136,9 @@
 			{@const latestRpe = rpePoints[rpePoints.length - 1].avg_rpe}
 			{@const avgRpe = rpePoints.reduce((s, d) => s + (d.avg_rpe ?? 0), 0) / rpePoints.length}
 			<div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-				<span>RPE cue, latest: <span class="font-semibold text-gray-900 dark:text-white">{latestRpe}</span></span>
-				<span>Average cue: <span class="font-semibold text-gray-900 dark:text-white">{avgRpe.toFixed(1)}</span></span>
-				<span class="text-gray-400 dark:text-gray-600">({rpePoints.length}/{data.length} scenes tagged)</span>
+				<span>RPE — latest: <span class="font-semibold text-gray-900 dark:text-white">{latestRpe}</span></span>
+				<span>avg: <span class="font-semibold text-gray-900 dark:text-white">{avgRpe.toFixed(1)}</span></span>
+				<span class="text-gray-400 dark:text-gray-600">({rpePoints.length}/{data.length} sessions tracked)</span>
 			</div>
 		{/if}
 	{/if}

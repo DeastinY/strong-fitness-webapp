@@ -102,7 +102,7 @@
 
 <Card class="p-4 sm:p-6">
 	<div class="flex items-center justify-between mb-4">
-		<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Attendance Heatboard</h3>
+		<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Calendar</h3>
 		<div class="flex items-center gap-1 sm:gap-2">
 			<button
 				on:click={prevMonth}
@@ -138,7 +138,7 @@
 				class="aspect-square rounded sm:rounded-md flex items-center justify-center text-[10px] sm:text-xs font-medium transition-colors
 					{day.isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}
 					{getIntensityClass(day.volume)}"
-				title={day.volume > 0 ? `${day.date.toLocaleDateString()}: ${Math.round(day.volume).toLocaleString()} lbs of staged load` : ''}
+				title={day.volume > 0 ? `${day.date.toLocaleDateString()}: ${Math.round(day.volume).toLocaleString()} lbs` : ''}
 			>
 				{day.date.getDate()}
 			</div>
@@ -146,7 +146,7 @@
 	</div>
 
 	<div class="mt-3 sm:mt-4 flex items-center justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
-		<span>Lighter</span>
+		<span>Less</span>
 		<div class="flex gap-0.5 sm:gap-1">
 			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-gray-100 dark:bg-gray-800"></div>
 			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-300 dark:bg-green-700"></div>
@@ -154,6 +154,6 @@
 			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-500 dark:bg-green-500"></div>
 			<div class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-sm bg-green-600 dark:bg-green-400"></div>
 		</div>
-		<span>Heavier</span>
+		<span>More</span>
 	</div>
 </Card>

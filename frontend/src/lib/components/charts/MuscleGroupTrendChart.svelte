@@ -75,8 +75,8 @@
 			type: 'line',
 			data: {
 				labels: months.map(monthLabel),
-						datasets: Object.entries(series).map(([cat, values]) => ({
-							label: `${cat.charAt(0).toUpperCase() + cat.slice(1)} Arc`,
+				datasets: Object.entries(series).map(([cat, values]) => ({
+					label: cat.charAt(0).toUpperCase() + cat.slice(1),
 					data: values,
 					borderColor: COLORS[cat] ?? 'rgb(156,163,175)',
 					backgroundColor: 'transparent',
@@ -121,7 +121,7 @@
 							maxTicksLimit: 5,
 							callback: v => `${Math.round(Number(v)).toLocaleString()}`
 						},
-						title: { display: true, text: `Arc volume (${unit})`, color: labelColor, font: { size: 10 } }
+						title: { display: true, text: `Volume (${unit})`, color: labelColor, font: { size: 10 } }
 					}
 				}
 			}
@@ -137,13 +137,13 @@
 </script>
 
 <Card class="p-4 sm:p-6">
-	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">Muscle Arc by Month</h3>
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">Volume by Muscle Group (Monthly)</h3>
 	<div class="h-56 sm:h-72">
 		{#if workoutDetails.length > 0}
 			<canvas bind:this={canvas}></canvas>
 		{:else}
 			<div class="h-full flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
-				No monthly arc data available
+				No data available
 			</div>
 		{/if}
 	</div>

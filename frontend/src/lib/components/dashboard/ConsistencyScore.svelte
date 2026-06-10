@@ -76,15 +76,15 @@
 	}
 
 	function getScoreLabel(score: number): string {
-		if (score >= 80) return 'Locked In';
-		if (score >= 60) return 'On Script';
-		if (score >= 40) return 'Building Momentum';
-		return 'Warmup Phase';
+		if (score >= 80) return 'Excellent';
+		if (score >= 60) return 'Good';
+		if (score >= 40) return 'Fair';
+		return 'Needs Work';
 	}
 </script>
 
 <Card class="p-4 sm:p-6">
-	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Consistency Meter</h3>
+	<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">Consistency</h3>
 
 	<div class="flex items-center justify-between mb-4 sm:mb-6">
 		<div>
@@ -124,7 +124,7 @@
 		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
 				<Target class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-				<span>Weekly target</span>
+				<span>Target</span>
 			</div>
 			<span class="font-medium text-gray-900 dark:text-white">{targetPerWeek}x/wk</span>
 		</div>
@@ -132,7 +132,7 @@
 		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
 				<Calendar class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-				<span>Current average</span>
+				<span>Average</span>
 			</div>
 			<span class="font-medium text-gray-900 dark:text-white">
 				{consistency.avgPerWeek.toFixed(1)}x/wk
@@ -142,7 +142,7 @@
 		<div class="flex items-center justify-between text-xs sm:text-sm">
 			<div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
 				<TrendingUp class="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-				<span>Recent drift</span>
+				<span>Trend</span>
 			</div>
 			<span class="font-medium {consistency.trend >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
 				{consistency.trend >= 0 ? '+' : ''}{consistency.trend}%
@@ -152,7 +152,7 @@
 
 	{#if consistency.weeks.length > 0}
 		<div class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 dark:border-gray-700/50">
-			<div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2">Last 12 weeks of attendance</div>
+			<div class="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mb-2">Last 12 weeks</div>
 			<div class="flex gap-1">
 				{#each consistency.weeks.slice(-12) as week}
 					{@const c = week.count}
@@ -170,8 +170,8 @@
 				{/each}
 			</div>
 			<div class="flex justify-between text-[10px] text-gray-400 dark:text-gray-500 mt-1 mb-2.5">
-				<span>12w back</span>
-				<span>Current week</span>
+				<span>12w ago</span>
+				<span>Now</span>
 			</div>
 			<!-- Legend -->
 			<div class="flex items-center gap-2 flex-wrap text-[10px] text-gray-500 dark:text-gray-400">
@@ -179,7 +179,7 @@
 				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-amber-200 dark:bg-amber-900"></div>1</div>
 				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-amber-400 dark:bg-amber-600"></div>2</div>
 				<div class="flex items-center gap-1"><div class="w-3 h-3 rounded bg-green-500"></div>3+</div>
-				<span class="ml-auto text-gray-400">sessions per week</span>
+				<span class="ml-auto text-gray-400">sessions/week</span>
 			</div>
 		</div>
 	{/if}

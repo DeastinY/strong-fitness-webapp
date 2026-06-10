@@ -8,7 +8,7 @@
 
 	export let data: VolumeDataPoint[];
 	export let unit: Unit;
-	export let title = 'Volume Storyline';
+	export let title = 'Volume Over Time';
 
 	let canvas: HTMLCanvasElement;
 	let chart: Chart | null = null;
@@ -53,7 +53,7 @@
 						callbacks: {
 							label: (context) => {
 								const value = context.parsed.y.toLocaleString();
-								return `Load storyline: ${value} ${unit}`;
+								return `Volume: ${value} ${unit}`;
 							}
 						}
 					}
@@ -110,7 +110,7 @@
 			<canvas bind:this={canvas}></canvas>
 		{:else}
 			<div class="h-full flex items-center justify-center text-gray-500 dark:text-gray-400">
-				No volume storyline yet
+				No data available
 			</div>
 		{/if}
 	</div>

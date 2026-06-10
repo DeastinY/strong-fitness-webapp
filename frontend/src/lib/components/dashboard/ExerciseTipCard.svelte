@@ -19,7 +19,7 @@
 			>
 				<span class="flex items-center justify-center gap-2">
 					<Lightbulb class="w-4 h-4" />
-					Coach Notes
+					Tips
 				</span>
 			</button>
 			<button
@@ -41,7 +41,7 @@
 			>
 				<span class="flex items-center justify-center gap-2">
 					<AlertTriangle class="w-4 h-4" />
-					Avoid Traps
+					Avoid
 				</span>
 			</button>
 		</div>

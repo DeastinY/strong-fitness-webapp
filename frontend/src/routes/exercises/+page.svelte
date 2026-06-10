@@ -87,12 +87,12 @@
 </script>
 
 <svelte:head>
-	<title>Lift Theater - Strong Stage</title>
+	<title>Exercises - Fitness Tracker</title>
 </svelte:head>
 
-<div class="stage-stack space-y-4 sm:space-y-6">
+<div class="space-y-4 sm:space-y-6">
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Exercise Spotlight</h1>
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Exercises</h1>
 		<div class="flex items-center gap-2 sm:gap-3">
 			<YearFilter />
 			<UnitToggle bind:unit />
@@ -109,7 +109,7 @@
 		</div>
 	{:else}
 		<Card class="p-6">
-			<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Choose the Featured Lift</h2>
+			<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Select Exercise</h2>
 			<ExerciseSelector {exercises} bind:selectedId={selectedExerciseId} />
 		</Card>
 
@@ -124,7 +124,7 @@
 						<Card class="p-6">
 							<div class="flex items-start justify-between">
 								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Peak Load</p>
+									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Best Weight</p>
 									<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
 										{formatWeight(prs.best_weight, unit)}
 									</p>
@@ -137,7 +137,7 @@
 						<Card class="p-6">
 							<div class="flex items-start justify-between">
 								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Peak Volume</p>
+									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Best Volume</p>
 									<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
 										{formatVolume(prs.best_volume, unit)} {unit}
 									</p>
@@ -150,7 +150,7 @@
 						<Card class="p-6">
 							<div class="flex items-start justify-between">
 								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Rep Crescendo</p>
+									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Best Reps</p>
 									<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{prs.best_reps}</p>
 								</div>
 								<div class="p-3 bg-green-50 dark:bg-green-900/50 rounded-lg">
@@ -161,7 +161,7 @@
 						<Card class="p-6">
 							<div class="flex items-start justify-between">
 								<div>
-									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Projected 1RM</p>
+									<p class="text-sm font-medium text-gray-500 dark:text-gray-400">Est. 1RM</p>
 									<p class="mt-2 text-2xl font-bold text-gray-900 dark:text-white">
 										{formatWeight(prs.best_estimated_1rm, unit)}
 									</p>
@@ -184,7 +184,7 @@
 					{#if exerciseTip}
 						<div>
 							<h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-								{selectedExercise?.name} Playbook
+								{selectedExercise?.name} Guide
 							</h3>
 							<ExerciseTipCard tip={exerciseTip} />
 						</div>
@@ -196,7 +196,7 @@
 					{#if exerciseSets.length > 0}
 						<Card class="p-4 sm:p-6">
 							<h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3">
-								Latest Scene <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">{formatDate(lastSession.date)}</span>
+								Last Session <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">{formatDate(lastSession.date)}</span>
 							</h3>
 							{@const hasRpe = exerciseSets.some(s => s.rpe != null)}
 							<div class="grid gap-1.5 text-sm" style="grid-template-columns: repeat({hasRpe ? 5 : 4}, minmax(0, 1fr))">
@@ -221,7 +221,7 @@
 			<Card class="p-12">
 				<div class="text-center text-gray-500 dark:text-gray-400">
 					<Dumbbell class="w-12 h-12 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-					<p>Pick a lift above to reveal progress arcs and headline records</p>
+					<p>Select an exercise above to view progress and personal records</p>
 				</div>
 			</Card>
 		{/if}

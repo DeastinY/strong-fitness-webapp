@@ -138,11 +138,9 @@
 	</style>
 </svelte:head>
 
-<div class="stage-stack space-y-6">
-
 <!-- Controls bar (hidden in print) -->
 <div class="no-print mb-6 flex flex-wrap items-center gap-3">
-	<h1 class="text-2xl font-bold text-gray-900 dark:text-white flex-1 min-w-0">Narrative Report Studio</h1>
+	<h1 class="text-2xl font-bold text-gray-900 dark:text-white flex-1 min-w-0">Trainer Report</h1>
 
 	<div class="flex items-center gap-2 text-sm">
 		<label for="report-from" class="text-gray-500 dark:text-gray-400 shrink-0">From</label>
@@ -154,13 +152,13 @@
 	</div>
 
 	<div class="flex rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden text-sm">
-		<button class="px-3 py-1.5 font-medium transition-colors {unit === 'lbs' ? 'bg-orange-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" on:click={() => (unit = 'lbs')}>lbs</button>
-		<button class="px-3 py-1.5 font-medium transition-colors {unit === 'kg' ? 'bg-orange-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" on:click={() => (unit = 'kg')}>kg</button>
+		<button class="px-3 py-1.5 font-medium transition-colors {unit === 'lbs' ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" on:click={() => (unit = 'lbs')}>lbs</button>
+		<button class="px-3 py-1.5 font-medium transition-colors {unit === 'kg' ? 'bg-blue-500 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'}" on:click={() => (unit = 'kg')}>kg</button>
 	</div>
 
 	<button on:click={() => window.print()}
-		class="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-medium transition-colors">
-		<Printer class="w-4 h-4" /> Print / Save Story PDF
+		class="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors">
+		<Printer class="w-4 h-4" /> Print / Save PDF
 	</button>
 </div>
 
@@ -180,22 +178,22 @@
 	<!-- Print header -->
 	<div class="mb-8 pb-5 border-b-2 border-gray-200 flex items-start justify-between">
 		<div>
-			<h1 class="text-3xl font-bold text-gray-900">Performance Story Report</h1>
+			<h1 class="text-3xl font-bold text-gray-900">Training Progress Report</h1>
 			<p class="text-lg text-gray-500 mt-1">{shortDate(report.date_from)} — {shortDate(report.date_to)}</p>
 		</div>
 		<div class="text-right text-sm text-gray-400">Generated {formatDate(report.generated_at)}</div>
 	</div>
 
 	<!-- Summary stats -->
-	<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Executive Snapshot</h2>
+	<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Summary</h2>
 	<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
 		{#each [
-			{ value: String(report.overview.total_workouts), label: 'Total sessions staged' },
-			{ value: String(report.overview.avg_workouts_per_week), label: 'Sessions per week' },
-			{ value: formatDuration(report.overview.avg_duration_minutes), label: 'Average runtime' },
-			{ value: convertWeight(report.overview.total_volume_lbs, unit).toLocaleString(), label: `Total load (${unit})` },
-			{ value: String(report.overview.total_sets), label: 'Total sets logged' },
-			{ value: String(report.overview.unique_exercises), label: 'Unique lifts' },
+			{ value: String(report.overview.total_workouts), label: 'Total sessions' },
+			{ value: String(report.overview.avg_workouts_per_week), label: 'Sessions / week' },
+			{ value: formatDuration(report.overview.avg_duration_minutes), label: 'Avg duration' },
+			{ value: convertWeight(report.overview.total_volume_lbs, unit).toLocaleString(), label: `Total volume (${unit})` },
+			{ value: String(report.overview.total_sets), label: 'Total sets' },
+			{ value: String(report.overview.unique_exercises), label: 'Exercises' },
 		] as stat}
 			<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
 				<div class="text-3xl font-bold text-blue-600">{stat.value}</div>
@@ -210,7 +208,7 @@
 	</div>
 
 	<!-- Attendance calendars -->
-	<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Attendance Cadence</h2>
+	<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Attendance</h2>
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
 		{#each monthlyCalendars as cal}
 			{@const count = cal.cells.filter(c => c.inMonth && c.hasWorkout).length}
@@ -241,7 +239,7 @@
 	<!-- Monthly + Day-of-week -->
 	<div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
 		<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-			<h3 class="font-semibold text-gray-900 dark:text-white mb-3">Sessions by Month</h3>
+			<h3 class="font-semibold text-gray-900 dark:text-white mb-3">Sessions per Month</h3>
 			<table class="w-full text-sm">
 				<thead><tr class="border-b border-gray-100 dark:border-gray-700">
 					<th class="text-left py-1.5 font-medium text-gray-500 dark:text-gray-400">Month</th>
@@ -258,7 +256,7 @@
 			</table>
 		</div>
 		<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
-			<h3 class="font-semibold text-gray-900 dark:text-white mb-3">Preferred Stage Days</h3>
+			<h3 class="font-semibold text-gray-900 dark:text-white mb-3">Preferred Training Days</h3>
 			<div class="space-y-2">
 				{#each report.attendance.day_of_week as dow}
 					<div class="flex items-center gap-2">
@@ -301,19 +299,19 @@
 			<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
 				<div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800 p-3 text-center">
 					<div class="text-xl font-bold text-blue-700 dark:text-blue-400">{formatWeight(exercise.pr.best_weight, unit)}</div>
-					<div class="text-xs text-blue-600 dark:text-blue-500 mt-0.5">Peak load</div>
+					<div class="text-xs text-blue-600 dark:text-blue-500 mt-0.5">Best weight</div>
 				</div>
 				<div class="bg-green-50 dark:bg-green-900/20 rounded-xl border border-green-100 dark:border-green-800 p-3 text-center">
 					<div class="text-xl font-bold text-green-700 dark:text-green-400">{formatWeight(exercise.pr.best_estimated_1rm, unit)}</div>
-					<div class="text-xs text-green-600 dark:text-green-500 mt-0.5">Projected 1RM</div>
+					<div class="text-xs text-green-600 dark:text-green-500 mt-0.5">Est. 1RM</div>
 				</div>
 				<div class="bg-purple-50 dark:bg-purple-900/20 rounded-xl border border-purple-100 dark:border-purple-800 p-3 text-center">
 					<div class="text-xl font-bold text-purple-700 dark:text-purple-400">{Math.round(exercise.pr.best_reps)}</div>
-					<div class="text-xs text-purple-600 dark:text-purple-500 mt-0.5">Rep peak</div>
+					<div class="text-xs text-purple-600 dark:text-purple-500 mt-0.5">Best reps</div>
 				</div>
 				<div class="bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-100 dark:border-orange-800 p-3 text-center">
 					<div class="text-xl font-bold text-orange-700 dark:text-orange-400">{formatVolume(exercise.pr.best_volume, unit)}</div>
-					<div class="text-xs text-orange-600 dark:text-orange-500 mt-0.5">Top-set volume ({unit})</div>
+					<div class="text-xs text-orange-600 dark:text-orange-500 mt-0.5">Best set vol. ({unit})</div>
 				</div>
 			</div>
 		{/if}
@@ -321,7 +319,7 @@
 		<!-- Charts -->
 		{#if exercise.progress.length >= 2}
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-				<ProgressChart data={exercise.progress} {unit} title="Top Load and Session Volume" />
+				<ProgressChart data={exercise.progress} {unit} title="Best weight & session volume" />
 				<ReportSetChart sessions={exercise.sessions} {unit} />
 			</div>
 		{/if}
@@ -380,5 +378,3 @@
 {/each}
 
 {/if}
-
-</div>

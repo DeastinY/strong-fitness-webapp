@@ -49,19 +49,19 @@
 </script>
 
 <svelte:head>
-	<title>Record Vault - Strong Stage</title>
+	<title>Records - Fitness Tracker</title>
 </svelte:head>
 
-<div class="stage-stack space-y-4 sm:space-y-6">
+<div class="space-y-4 sm:space-y-6">
 	<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">All-Time Record Vault</h1>
+		<h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">All-Time Records</h1>
 		<UnitToggle bind:unit />
 	</div>
 
 	{#if loading}
 		<div class="flex flex-col items-center justify-center h-64 gap-3">
 			<div class="w-10 h-10 rounded-full border-4 border-blue-200 border-t-blue-600 animate-spin"></div>
-			<p class="text-sm text-gray-500 dark:text-gray-400">Unsealing your legend board...</p>
+			<p class="text-sm text-gray-500 dark:text-gray-400">Loading records...</p>
 		</div>
 	{:else if error}
 		<div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-red-700 dark:text-red-400">
@@ -78,7 +78,7 @@
 									class="flex items-center gap-1 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
 									on:click={() => toggleSort('name')}
 								>
-									Lift
+									Exercise
 									<ArrowUpDown class="w-3 h-3 {sortKey === 'name' ? 'text-blue-500' : ''}" />
 								</button>
 							</th>
@@ -87,19 +87,19 @@
 									class="flex items-center gap-1 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors ml-auto"
 									on:click={() => toggleSort('weight')}
 								>
-									Peak Load
+									Best Weight
 									<ArrowUpDown class="w-3 h-3 {sortKey === 'weight' ? 'text-blue-500' : ''}" />
 								</button>
 							</th>
 							<th class="text-right px-3 sm:px-4 py-3 hidden sm:table-cell">
-								<span class="font-semibold text-gray-500 dark:text-gray-400">Rep Peak</span>
+								<span class="font-semibold text-gray-500 dark:text-gray-400">Best Reps</span>
 							</th>
 							<th class="text-right px-3 sm:px-4 py-3">
 								<button
 									class="flex items-center gap-1 font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors ml-auto"
 									on:click={() => toggleSort('1rm')}
 								>
-									Projected 1RM
+									Est. 1RM
 									<ArrowUpDown class="w-3 h-3 {sortKey === '1rm' ? 'text-blue-500' : ''}" />
 								</button>
 							</th>
@@ -141,7 +141,7 @@
 		</Card>
 
 		<p class="text-xs text-center text-gray-400 dark:text-gray-600">
-			Every headline PR across every session. Projected 1RM uses the Epley formula.
+			All-time personal records across all sessions. Est. 1RM uses Epley formula.
 		</p>
 	{/if}
 </div>

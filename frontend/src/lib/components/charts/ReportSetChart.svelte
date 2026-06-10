@@ -45,9 +45,9 @@
 			type: 'line',
 			data: {
 				labels,
-					datasets: [
+				datasets: [
 					{
-						label: `Session load (${u})`,
+						label: `Volume (${u})`,
 						data: totalVolume,
 						borderColor: 'rgb(59,130,246)',
 						backgroundColor: 'rgba(59,130,246,0.1)',
@@ -59,7 +59,7 @@
 						order: 2,
 					},
 					{
-						label: 'Rep count',
+						label: 'Total reps',
 						data: totalReps,
 						borderColor: 'rgb(34,197,94)',
 						backgroundColor: 'rgba(34,197,94,0)',
@@ -100,14 +100,14 @@
 										.filter(s => s.weight_lbs != null && s.reps != null)
 										.map(s => `${Math.round(s.reps!)}×${Math.round(convertWeight(s.weight_lbs!, u))}`);
 									const breakdown = parts.length > 1 ? ` (${parts.join(' + ')})` : '';
-									return `Session load: ${v} ${u}${breakdown}`;
+									return `Volume: ${v} ${u}${breakdown}`;
 								}
 								// Reps breakdown: "12 (5+5+2)"
 								const parts = sets
 									.filter(s => s.reps != null)
 									.map(s => Math.round(s.reps!));
 								const breakdown = parts.length > 1 ? ` (${parts.join('+')})` : '';
-								return `Rep count: ${v}${breakdown}`;
+								return `Total reps: ${v}${breakdown}`;
 							},
 						},
 					},
@@ -125,14 +125,14 @@
 							color: tickColor,
 							callback: (v) => (typeof v === 'number' ? v.toLocaleString() : v),
 						},
-						title: { display: true, text: `Session load (${u})`, color: labelColor, font: { size: 10 } },
+						title: { display: true, text: `Volume (${u})`, color: labelColor, font: { size: 10 } },
 					},
 					y1: {
 						position: 'right',
 						beginAtZero: false,
 						grid: { drawOnChartArea: false },
 						ticks: { color: 'rgb(34,197,94)' },
-						title: { display: true, text: 'Rep count', color: 'rgb(34,197,94)', font: { size: 10 } },
+						title: { display: true, text: 'Total reps', color: 'rgb(34,197,94)', font: { size: 10 } },
 					},
 				},
 			},
@@ -148,7 +148,7 @@
 </script>
 
 <Card class="p-4 sm:p-6">
-	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Rep Count and Load per Session</h3>
+	<h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Total reps & volume per session</h3>
 	<div class="h-56 sm:h-64">
 		<canvas bind:this={canvas}></canvas>
 	</div>

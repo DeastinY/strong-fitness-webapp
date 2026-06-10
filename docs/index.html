@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fitness Tracker — Personal Workout Dashboard</title>
-  <meta name="description" content="A self-hosted personal workout dashboard. Visualise gym progress, track PRs, and generate printable trainer reports from your own data." />
+  <title>Strong Stage — Performative Workout Analytics</title>
+  <meta name="description" content="A self-hosted, performative workout dashboard. Turn your training exports into a dramatic progress story with charts, PRs, and printable reports." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --border: #2a2d3a;
-      --text: #e8eaf0;
-      --muted: #8b90a0;
-      --accent: #3b82f6;
-      --accent-soft: rgba(59,130,246,.15);
+      --bg: #120f0d;
+      --surface: #1f1712;
+      --border: #3c2b20;
+      --text: #f7efe8;
+      --muted: #bba79a;
+      --accent: #ef5a28;
+      --accent-soft: rgba(239,90,40,.18);
       --green: #22c55e;
       --green-soft: rgba(34,197,94,.12);
       --radius: 12px;
@@ -22,9 +25,12 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg);
+      background:
+        radial-gradient(900px 600px at 5% -10%, rgba(239,90,40,.2), transparent 60%),
+        radial-gradient(800px 500px at 95% 0%, rgba(255,197,90,.15), transparent 60%),
+        var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
@@ -197,11 +203,11 @@
 
 <!-- ── Hero ── -->
 <section class="hero container">
-  <div class="badge">Self-hosted · Open source · 2 containers</div>
-  <h1>Visualize your training.<br /><em>Nothing else.</em></h1>
-  <p class="hero-sub">Keep logging in Strong. Drop in the CSV export. Get a self-hosted analytics dashboard with charts, PRs, and printable trainer reports — no new habits required.</p>
+  <div class="badge">Performative UI · Self-hosted · Open source</div>
+  <h1>Your training data,<br /><em>presented like a headline.</em></h1>
+  <p class="hero-sub">Keep logging in Strong. Drop in your CSV export. Instantly project your training arc through cinematic charts, PR boards, and coach-ready report scenes.</p>
   <div class="cta-row">
-    <a href="#install" class="btn btn-primary">Get started free ↓</a>
+    <a href="#install" class="btn btn-primary">Start the show ↓</a>
     <a href="https://github.com/DeastinY/strong-fitness-webapp" class="btn btn-ghost">
       <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
       GitHub
@@ -220,7 +226,7 @@
         <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
         <div class="browser-bar">localhost:3000</div>
       </div>
-      <img src="screenshots/dashboard.png" alt="Dashboard with KPI cards, volume trend chart, and consistency heatmap" />
+      <img src="screenshots/dashboard.png" alt="Dashboard with KPI cards, volume arc chart, and consistency heatmap" />
     </div>
   </div>
 
@@ -245,7 +251,7 @@
 <!-- ── Screenshots ── -->
 <section class="screenshots container" id="screenshots">
   <div class="section-label">In action</div>
-  <h2>Everything in view</h2>
+  <h2>Every scene in view</h2>
   <p class="sub">Dark theme, kg / lbs toggle, and year filter across all pages.</p>
   <div class="shot-grid">
     <div class="shot-card">
@@ -256,7 +262,7 @@
         </div>
         <img src="screenshots/workouts.png" alt="Workouts page with weekly frequency and session duration chart" />
       </div>
-      <span class="caption">Frequency &amp; session history</span>
+      <span class="caption">Rhythm &amp; session chronology</span>
     </div>
     <div class="shot-card">
       <div class="browser-frame">
@@ -266,7 +272,7 @@
         </div>
         <img src="screenshots/records.png" alt="All-time PR table sorted by estimated 1RM" />
       </div>
-      <span class="caption">All-time personal records</span>
+      <span class="caption">All-time record vault</span>
     </div>
     <div class="shot-card">
       <div class="browser-frame">
@@ -276,7 +282,7 @@
         </div>
         <img src="screenshots/report.png" alt="Trainer report with summary stats and monthly load chart" />
       </div>
-      <span class="caption">Trainer progress report</span>
+      <span class="caption">Narrative progress report</span>
     </div>
   </div>
 </section>
@@ -284,29 +290,29 @@
 <!-- ── Features ── -->
 <section class="features container" id="features">
   <div class="section-label">Features</div>
-  <h2>Pure signal, no noise.</h2>
-  <p class="sub">No accounts, no routines, no meal plans. Just your data, visualized.</p>
+  <h2>High-signal analytics, theatrical delivery.</h2>
+  <p class="sub">No accounts, no routines, no meal plans. Just your own data, staged with intent.</p>
   <div class="grid">
     <div class="card">
       <div class="card-head">
         <div class="icon icon-blue">📈</div>
-        <h3>Volume trends</h3>
+        <h3>Volume arcs</h3>
       </div>
-      <p>Weekly and monthly load charts across all muscle groups. See exactly when you peaked — and when you backed off.</p>
+      <p>Weekly and monthly load arcs across muscle groups. See when momentum rises, stalls, and explodes.</p>
     </div>
     <div class="card">
       <div class="card-head">
         <div class="icon icon-blue">🏆</div>
-        <h3>Personal records</h3>
+        <h3>Record vault</h3>
       </div>
-      <p>Best weight, estimated 1RM (Epley formula), and best reps per exercise. Sortable table, updated automatically on every import.</p>
+      <p>Peak load, projected 1RM (Epley), and rep peaks per exercise. Auto-updated every import.</p>
     </div>
     <div class="card">
       <div class="card-head">
         <div class="icon icon-green">📅</div>
-        <h3>Consistency heatmap</h3>
+        <h3>Consistency heatboard</h3>
       </div>
-      <p>12-week calendar heatmap and weekly frequency chart — because showing up is half the battle.</p>
+      <p>12-week attendance board and weekly rhythm chart — because frequency builds outcomes.</p>
     </div>
     <div class="card">
       <div class="card-head">
@@ -360,7 +366,7 @@
 <section class="comparison container">
   <div class="section-label">Alternatives</div>
   <h2>Built to do one thing well</h2>
-  <p class="sub">wger, workout.cool, and LiftLog are full training platforms — routines, planning, nutrition, social. This is not that. It's a pure visualization layer: drop in a CSV, see your data.</p>
+  <p class="sub">wger, workout.cool, and LiftLog are full training platforms. This is intentionally narrower: import CSV, reveal your performance story.</p>
   <div class="cmp-wrap">
     <table class="cmp">
       <thead>
@@ -430,7 +436,7 @@
           <td class="part">server + mobile app</td>
         </tr>
         <tr>
-          <td class="row-label">AI slop without any heart</td>
+          <td class="row-label">Performative UI voice</td>
           <td class="col-us yes">✓</td>
           <td class="no">✗</td>
           <td class="no">✗</td>
